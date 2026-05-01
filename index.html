@@ -7,7 +7,7 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 <style>
     * {margin:0;padding:0;box-sizing:border-box;font-family:'Inter','Segoe UI',sans-serif}
-  body {background:#f5f5f5;color:#1a1a1a;padding-bottom:200px}
+  body {background:#f5f5f5;color:#1a1a1a;padding-bottom:220px}
   .header {background:#DC2626;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #eee;position:sticky;top:0;z-index:100;color:white}
   .header-left p {font-size:12px;opacity:0.9;margin-bottom:4px;letter-spacing:1px}
   .header-left h1 {font-size:24px;font-weight:800;display:flex;align-items:center;gap:8px}
@@ -18,9 +18,14 @@
   .scan-box h2 {font-size:18px;margin-bottom:8px;font-weight:700}
   .scan-status {font-size:14px;opacity:0.9;margin-bottom:12px;min-height:20px}
   .scan-input {width:100%;padding:14px;border:2px solid white;border-radius:12px;font-size:16px;background:white;color:#1a1a1a;text-align:center;font-weight:700}
+  .scan-input:focus {outline:none;box-shadow:0 0 0 3px rgba(255,255,255,0.3)}
   .last-scan {background:#15803d;border-radius:12px;padding:12px;margin:12px 0;text-align:center;display:none}
   .last-scan h3 {font-size:14px;opacity:0.9;margin-bottom:4px}
   .last-scan p {font-size:18px;font-weight:800}
+  #reader {width:100%;border-radius:12px;overflow:hidden;margin:12px 0;display:none}
+  .scan-btn-group {display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .scan-btn {padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;background:white;color:#16a34a}
+  .scan-btn.dark {background:#15803d;color:white}
   .section-title {font-size:20px;font-weight:800;margin:20px 0 12px}
   .kategori {display:flex;gap:8px;overflow-x:auto;padding:8px 0 16px}
   .kategori button {padding:8px 16px;border:none;border-radius:20px;background:#e5e5e5;font-weight:600;white-space:nowrap;font-size:14px}
@@ -31,8 +36,6 @@
   .produk-right {text-align:right}
   .produk-harga {font-size:18px;font-weight:800;color:#DC2626;margin-bottom:8px}
   .btn-tambah {padding:8px 20px;background:#1a1a1a;color:white;border:none;border-radius:10px;font-weight:700;font-size:14px}
-  
-  /* AREA PEMBAYARAN ALFAMART STYLE */
   .payment-fixed {position:fixed;bottom:0;left:0;right:0;background:white;padding:16px;box-shadow:0 -4px 12px rgba(0,0,0,0.1);max-width:600px;margin:auto}
   .total-row {display:flex;justify-content:space-between;font-size:20px;font-weight:800;margin-bottom:12px}
   .btn-total {width:100%;padding:18px;background:#DC2626;color:white;border:none;border-radius:12px;font-size:18px;font-weight:800;margin-bottom:8px}
@@ -46,8 +49,6 @@
   .kembalian {display:none;background:#FEF3C7;padding:12px;border-radius:12px;text-align:center;margin:8px 0}
   .kembalian h3 {color:#92400E;font-size:16px;margin-bottom:4px}
   .kembalian p {color:#DC2626;font-size:24px;font-weight:800}
-  
-  /* STRUK */
   .struk {display:none;background:white;padding:20px;border:1px dashed #ccc;margin:16px;font-family:monospace;font-size:12px}
   .struk h2 {text-align:center;margin-bottom:8px}
   .struk-center {text-align:center}
@@ -57,79 +58,59 @@
 </head>
 <body>
 <div class="header">
-  <div class="header-left">
-    <p>KASIR DIGITAL</p>
-    <h1>🛒 TOKO ANIS</h1>
-  </div>
-  <div class="cart-icon">
-    🧺
-    <div class="cart-count" id="cartCount">0</div>
-  </div>
+  <div class="header-left"><p>KASIR DIGITAL</p><h1>🛒 TOKO ANIS</h1></div>
+  <div class="cart-icon">🧺<div class="cart-count" id="cartCount">0</div></div>
 </div>
 
 <div class="container">
   <div class="scan-box">
     <h2>SCAN BARANG</h2>
     <div class="scan-status" id="scanStatus">Siap scan...</div>
-    <input type="text" class="scan-input" id="inputManual" placeholder="TIT" autofocus>
-    <div class="last-scan" id="lastScan">
-      <h3>TERAKHIR SCAN:</h3>
-      <p id="lastScanText"></p>
+    <input type="text" class="scan-input" id="inputManual" placeholder="ARAHKAN SCANNER KE SINI" autofocus>
+    <div class="last-scan" id="lastScan"><h3>TERAKHIR SCAN:</h3><p id="lastScanText"></p></div>
+    <div id="reader"></div>
+    <div class="scan-btn-group">
+      <button class="scan-btn" onclick="resetKeranjang()">🔄 RESET</button>
+      <button class="scan-btn dark" id="btnKamera">📷 KAMERA</button>
     </div>
   </div>
 
   <h2 class="section-title">Daftar Produk</h2>
   <div class="kategori">
     <button class="active" onclick="filterKategori('Semua')">Semua</button>
-    <button onclick="filterKategori('Mild')">Mild</button>
-    <button onclick="filterKategori('Kretek')">Kretek</button>
+    <button onclick="filterKategori('Rokok')">Rokok</button>
     <button onclick="filterKategori('Minuman')">Minuman</button>
-    <button onclick="filterKategori('Mie')">Mie</button>
+    <button onclick="filterKategori('Mie')">Mie Instan</button>
+    <button onclick="filterKategori('Snack')">Snack</button>
+    <button onclick="filterKategori('Sembako')">Sembako</button>
   </div>
   <div id="produkList"></div>
 </div>
 
-<!-- AREA PEMBAYARAN ALA ALFAMART -->
 <div class="payment-fixed">
-  <div class="total-row">
-    <span>SUBTOTAL:</span>
-    <span id="totalHarga">Rp0</span>
-  </div>
-  
-  <button class="btn-total" id="btnTotal" onclick="showPayment()">💰 TOTAL & BAYAR</button>
-  
-  <!-- PILIHAN BAYAR MUNCUL SETELAH PENCET TOTAL -->
+  <div class="total-row"><span>SUBTOTAL:</span><span id="totalHarga">Rp0</span></div>
+  <button class="btn-total" id="btnTotal" onclick="showPayment()">💰 PILIH METODE BAYAR</button>
   <div class="payment-options" id="paymentOptions">
     <button class="btn-pay btn-cash" onclick="bayarCash()">💵 CASH</button>
     <button class="btn-pay btn-qris" onclick="bayarQRIS()">📱 QRIS</button>
     <button class="btn-pay btn-debit" onclick="bayarDebit()">💳 DEBIT</button>
   </div>
-  
-  <!-- INPUT UANG CASH -->
   <div class="cash-input" id="cashInput">
     <input type="number" id="uangCash" placeholder="Masukkan Uang Pelanggan" onkeyup="hitungKembalian()">
   </div>
-  
-  <!-- KEMBALIAN -->
   <div class="kembalian" id="kembalianBox">
-    <h3>KEMBALIAN</h3>
-    <p id="kembalianText">Rp0</p>
+    <h3>KEMBALIAN</h3><p id="kembalianText">Rp0</p>
     <button class="btn-total" style="background:#16a34a;margin-top:8px" onclick="selesaiTransaksi()">✅ SELESAI & CETAK STRUK</button>
   </div>
 </div>
 
-<!-- STRUK BUAT DI PRINT -->
 <div class="struk" id="struk">
   <h2>TOKO ANIS</h2>
-  <div class="struk-center">Jl. Contoh No.123 Tulungagung</div>
+  <div class="struk-center">Jl. Raya Tulungagung No. 123</div>
   <div class="struk-center">Telp: 0857-xxxx-xxxx</div>
-  <div class="struk-line"></div>
-  <div id="strukItem"></div>
-  <div class="struk-line"></div>
-  <div id="strukTotal"></div>
-  <div class="struk-line"></div>
-  <div class="struk-center">Terima Kasih</div>
-  <div class="struk-center" id="strukTanggal"></div>
+  <div class="struk-line"></div><div id="strukItem"></div><div class="struk-line"></div>
+  <div id="strukTotal"></div><div class="struk-line"></div>
+  <div class="struk-center">Terima Kasih Sudah Belanja</div><div class="struk-center" id="strukTanggal"></div>
 </div>
 
 <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
@@ -137,20 +118,50 @@
 
 <script>
 const produk = [
-  {id:1,nama:"Sampoerna A Mild 16",harga:32000,kategori:"Mild",barcode:"8998999270015"},
-  {id:2,nama:"LA Bold 16",harga:28000,kategori:"Mild",barcode:"8994902140027"},
-  {id:3,nama:"Djarum Super 16",harga:29000,kategori:"Kretek",barcode:"8994901010018"},
-  {id:4,nama:"Indomie Goreng",harga:3500,kategori:"Mie",barcode:"089686010013"},
-  {id:5,nama:"Le Minerale 300ml",harga:2500,kategori:"Minuman",barcode:"8996001600269"},
-  {id:6,nama:"Le Minerale 600ml",harga:3500,kategori:"Minuman",barcode:"8993001120022"},
-  {id:7,nama:"Aqua 600ml",harga:4000,kategori:"Minuman",barcode:"8992761111017"},
+  // ROKOK MILD
+  {id:1,nama:"Sampoerna A Mild 16",harga:32000,kategori:"Rokok",barcode:"8998999270015"},
+  {id:2,nama:"Sampoerna A Mild 12",harga:25000,kategori:"Rokok",barcode:"8998999270039"},
+  {id:3,nama:"LA Bold 16",harga:28000,kategori:"Rokok",barcode:"8994902140027"},
+  {id:4,nama:"LA Lights 16",harga:27000,kategori:"Rokok",barcode:"8994902140010"},
+  {id:5,nama:"Magnum Filter 16",harga:29000,kategori:"Rokok",barcode:"8999909090011"},
+  {id:6,nama:"Magnum Mild 16",harga:28000,kategori:"Rokok",barcode:"8999909090028"},
+  // ROKOK KRETEK
+  {id:7,nama:"Djarum Super 16",harga:29000,kategori:"Rokok",barcode:"8994901010018"},
+  {id:8,nama:"Djarum Super 12",harga:22000,kategori:"Rokok",barcode:"8994901010025"},
+  {id:9,nama:"GG Merah 12",harga:18000,kategori:"Rokok",barcode:"8991001100017"},
+  {id:10,nama:"Dji Sam Soe 12",harga:21000,kategori:"Rokok",barcode:"8999909090035"},
+  // ROKOK PUTIH
+  {id:11,nama:"Marlboro Merah 20",harga:38000,kategori:"Rokok",barcode:"8888000030011"},
+  {id:12,nama:"Marlboro Light 20",harga:38000,kategori:"Rokok",barcode:"8888000030028"},
+  {id:13,nama:"Lucky Strike 20",harga:36000,kategori:"Rokok",barcode:"8888000200018"},
+  // MINUMAN
+  {id:14,nama:"Le Minerale 300ml",harga:2500,kategori:"Minuman",barcode:"8996001600269"},
+  {id:15,nama:"Le Minerale 600ml",harga:3500,kategori:"Minuman",barcode:"8993001120022"},
+  {id:16,nama:"Aqua 600ml",harga:4000,kategori:"Minuman",barcode:"8992761111017"},
+  {id:17,nama:"Teh Pucuk 350ml",harga:4000,kategori:"Minuman",barcode:"8999909090012"},
+  {id:18,nama:"Teh Kotak 300ml",harga:4500,kategori:"Minuman",barcode:"8992771001118"},
+  {id:19,nama:"Coca Cola 390ml",harga:6000,kategori:"Minuman",barcode:"8992761120019"},
+  {id:20,nama:"Fanta 390ml",harga:6000,kategori:"Minuman",barcode:"8992761130018"},
+  {id:21,nama:"Pocari Sweat 350ml",harga:7000,kategori:"Minuman",barcode:"8992726001001"},
+  // MIE INSTAN
+  {id:22,nama:"Indomie Goreng",harga:3500,kategori:"Mie",barcode:"089686010013"},
+  {id:23,nama:"Indomie Ayam Bawang",harga:3500,kategori:"Mie",barcode:"089686010020"},
+  {id:24,nama:"Mie Sedaap Goreng",harga:3500,kategori:"Mie",barcode:"8998866200153"},
+  {id:25,nama:"Mie Sedaap Soto",harga:3500,kategori:"Mie",barcode:"8998866200160"},
+  {id:26,nama:"Supermie Ayam",harga:3000,kategori:"Mie",barcode:"089686020012"},
+  {id:27,nama:"Sarimi Isi 2",harga:3500,kategori:"Mie",barcode:"8992761112014"},
+  // SNACK
+  {id:28,nama:"Chitato Sapi Panggang",harga:10000,kategori:"Snack",barcode:"8992761100011"},
+  {id:29,nama:"Qtela Tempe",harga:8000,kategori:"Snack",barcode:"8998009100123"},
+  {id:30,nama:"Taro Net",harga:9000,kategori:"Snack",barcode:"8992761113011"},
+  // SEMBAKO
+  {id:31,nama:"Beras 5kg",harga:75000,kategori:"Sembako",barcode:"2000000011"},
+  {id:32,nama:"Minyak Goreng 1L",harga:18000,kategori:"Sembako",barcode:"8991001200013"},
+  {id:33,nama:"Gula 1kg",harga:17000,kategori:"Sembako",barcode:"8991001300010"},
 ];
 
-let keranjang = [];
-let totalBelanja = 0;
-const beepSound = document.getElementById('beep');
-const thanksSound = document.getElementById('thanks');
-
+let keranjang = []; let totalBelanja = 0; let html5QrcodeScanner;
+const beepSound = document.getElementById('beep'); const thanksSound = document.getElementById('thanks');
 function playBeep() { beepSound.currentTime = 0; beepSound.play(); navigator.vibrate(50); }
 function playThanks() { thanksSound.currentTime = 0; thanksSound.play(); }
 
@@ -160,20 +171,15 @@ function renderProduk(filter = 'Semua') {
   list.innerHTML = data.map(p => `
     <div class="produk-card">
       <div class="produk-info"><h3>${p.nama}</h3><p>${p.barcode}</p></div>
-      <div class="produk-right">
-        <div class="produk-harga">${p.harga.toLocaleString('id-ID')}</div>
-        <button class="btn-tambah" onclick="tambahKeranjang(${p.id})">TAMBAH</button>
-      </div>
-    </div>
-  `).join('');
+      <div class="produk-right"><div class="produk-harga">${p.harga.toLocaleString('id-ID')}</div>
+      <button class="btn-tambah" onclick="tambahKeranjang(${p.id})">TAMBAH</button></div>
+    </div>`).join('');
 }
 
 function tambahKeranjang(id) {
-  const item = keranjang.find(i => i.id === id);
-  const p = produk.find(p=>p.id===id);
+  const item = keranjang.find(i => i.id === id); const p = produk.find(p=>p.id===id);
   if(item) item.qty++; else keranjang.push({...p,qty:1});
-  playBeep();
-  updateKeranjang();
+  playBeep(); updateKeranjang();
   document.getElementById('lastScan').style.display = 'block';
   document.getElementById('lastScanText').textContent = `${p.nama} - Rp${p.harga.toLocaleString('id-ID')}`;
   document.getElementById('inputManual').focus();
@@ -186,10 +192,18 @@ function updateKeranjang() {
   document.getElementById('cartCount').textContent = count;
 }
 
+function resetKeranjang() {
+  if(confirm('Reset semua belanjaan?')) {
+    keranjang = []; updateKeranjang();
+    document.getElementById('lastScan').style.display = 'none';
+    document.getElementById('inputManual').focus();
+  }
+}
+
 function showPayment() {
   if(keranjang.length===0) return alert('Keranjang kosong!');
   document.getElementById('paymentOptions').style.display = 'grid';
-  document.getElementById('btnTotal').textContent = 'PILIH METODE BAYAR';
+  document.getElementById('btnTotal').textContent = 'PILIH: CASH / QRIS / DEBIT';
   document.getElementById('btnTotal').disabled = true;
 }
 
@@ -202,19 +216,21 @@ function bayarCash() {
 function hitungKembalian() {
   const uang = parseInt(document.getElementById('uangCash').value) || 0;
   const kembalian = uang - totalBelanja;
-  if(kembalian >= 0) {
+  if(uang > 0 && kembalian >= 0) {
     document.getElementById('kembalianBox').style.display = 'block';
     document.getElementById('kembalianText').textContent = 'Rp' + kembalian.toLocaleString('id-ID');
+  } else {
+    document.getElementById('kembalianBox').style.display = 'none';
   }
 }
 
 function bayarQRIS() {
-  alert(`Total: Rp${totalBelanja.toLocaleString('id-ID')}\n\nSilakan scan QRIS Toko Anis.\nTunjukkan bukti bayar ke kasir.`);
+  alert(`Total: Rp${totalBelanja.toLocaleString('id-ID')}\n\nSilakan scan QRIS Toko Anis.`);
   selesaiTransaksi('QRIS');
 }
 
 function bayarDebit() {
-  alert(`Total: Rp${totalBelanja.toLocaleString('id-ID')}\n\nSilakan gesek kartu debit di EDC.\n(Manual karena ini web)`);
+  alert(`Total: Rp${totalBelanja.toLocaleString('id-ID')}\n\nSilakan gesek kartu debit.`);
   selesaiTransaksi('DEBIT');
 }
 
@@ -223,13 +239,11 @@ function selesaiTransaksi(metode = 'CASH') {
   generateStruk(metode);
   setTimeout(() => {
     if(confirm('Cetak struk?')) window.print();
-    // Reset transaksi
-    keranjang = [];
-    updateKeranjang();
+    keranjang = []; updateKeranjang();
     document.getElementById('paymentOptions').style.display = 'none';
     document.getElementById('cashInput').style.display = 'none';
     document.getElementById('kembalianBox').style.display = 'none';
-    document.getElementById('btnTotal').textContent = '💰 TOTAL & BAYAR';
+    document.getElementById('btnTotal').textContent = '💰 PILIH METODE BAYAR';
     document.getElementById('btnTotal').disabled = false;
     document.getElementById('lastScan').style.display = 'none';
     document.getElementById('uangCash').value = '';
@@ -238,21 +252,14 @@ function selesaiTransaksi(metode = 'CASH') {
 }
 
 function generateStruk(metode) {
-  let itemText = '';
-  keranjang.forEach(i => {
+  let itemText = ''; keranjang.forEach(i => {
     itemText += `${i.nama}\n${i.qty} x ${i.harga.toLocaleString('id-ID')} = ${(i.harga*i.qty).toLocaleString('id-ID')}\n`;
   });
-  
   document.getElementById('strukItem').innerHTML = itemText.replace(/\n/g,'<br>');
-  document.getElementById('strukTotal').innerHTML = `
-    TOTAL: Rp${totalBelanja.toLocaleString('id-ID')}<br>
-    BAYAR: ${metode}<br>
-    ${metode==='CASH' ? 'KEMBALI: Rp'+(parseInt(document.getElementById('uangCash').value)-totalBelanja).toLocaleString('id-ID') : ''}
-  `;
+  document.getElementById('strukTotal').innerHTML = `TOTAL: Rp${totalBelanja.toLocaleString('id-ID')}<br>BAYAR: ${metode}<br>${metode==='CASH' ? 'KEMBALI: Rp'+(parseInt(document.getElementById('uangCash').value)-totalBelanja).toLocaleString('id-ID') : ''}`;
   document.getElementById('strukTanggal').textContent = new Date().toLocaleString('id-ID');
 }
 
-// SCAN AUTO ALFAMART MODE
 document.getElementById('inputManual').addEventListener('input', function(e) {
   let barcode = e.target.value.replace(/\s/g, '');
   if(barcode.length >= 8) {
@@ -262,14 +269,29 @@ document.getElementById('inputManual').addEventListener('input', function(e) {
   }
 });
 
+document.getElementById('btnKamera').onclick = () => {
+  const reader = document.getElementById('reader');
+  if(reader.style.display === 'none' || reader.style.display === '') {
+    reader.style.display = 'block';
+    html5QrcodeScanner = new Html5QrcodeScanner("reader",{fps:10,qrbox:250});
+    html5QrcodeScanner.render((barcode) => {
+      const p = produk.find(p=>p.barcode===barcode);
+      if(p) tambahKeranjang(p.id);
+    });
+  } else {
+    html5QrcodeScanner.clear();
+    reader.style.display = 'none';
+    document.getElementById('inputManual').focus();
+  }
+};
+
 document.addEventListener('click', () => document.getElementById('inputManual').focus());
 window.addEventListener('load', () => { document.getElementById('inputManual').focus(); renderProduk(); });
 setInterval(() => document.getElementById('inputManual').focus(), 3000);
 
 function filterKategori(kat) {
   document.querySelectorAll('.kategori button').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
-  renderProduk(kat);
+  event.target.classList.add('active'); renderProduk(kat);
 }
 </script>
 </body>
