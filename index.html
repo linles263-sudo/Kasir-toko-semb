@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KASIR DIGITAL PRO - TOKO ANIS</title>
+    <title>KASIR DIGITAL PRO</title>
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background: #f5f5f5; padding-bottom: 120px; }
         .header { background: #d32f2f; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
         .header .title h1 { font-size: 14px; font-weight: normal; }
-        .header .title h2 { font-size: 24px; }
+        .header .title h2 { font-size: 24px; text-transform: uppercase; }
         .header .kasir-info { text-align: right; font-size: 14px; }
         .header .cart-icon { background: #ffca28; color: black; padding: 8px; border-radius: 50%; position: relative; display: inline-block; margin-left: 8px; }
         .header .cart-count { position: absolute; top: -5px; right: -5px; background: #ffca28; color: black; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
@@ -19,10 +19,12 @@
         .scan-buttons { display: flex; justify-content: space-around; margin-top: 10px; }
         .scan-btn { background: white; color: #4CAF50; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         #reader { width: 100%; margin-top: 10px; border-radius: 8px; display: none; }
-        .produk-header { display: flex; justify-content: space-between; align-items: center; padding: 0 15px; margin-top: 15px; gap: 8px; }
+        .produk-header { display: flex; justify-content: space-between; align-items: center; padding: 0 15px; margin-top: 15px; gap: 6px; flex-wrap: wrap; }
         .produk-header h3 { font-size: 18px; }
-        .btn-laporan { background: #2196F3; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
-        .btn-hapus-data { background: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+        .btn-header { color: white; border: none; padding: 8px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        .btn-laporan { background: #2196F3; }
+        .btn-hapus-data { background: #d32f2f; }
+        .btn-setting { background: #FF9800; }
         .kategori { display: flex; overflow-x: auto; padding: 10px 15px; gap: 10px; }
         .kategori-btn { background: #e0e0e0; border: none; padding: 8px 15px; border-radius: 20px; white-space: nowrap; }
         .kategori-btn.aktif { background: #333; color: white; }
@@ -53,7 +55,7 @@
     <div class="header">
         <div class="title">
             <h1>KASIR DIGITAL PRO</h1>
-            <h2>TOKO ANIS</h2>
+            <h2 id="namaToko">TOKO ANIS</h2>
         </div>
         <div class="kasir-info">
             Kasir: <span id="namaKasir">-</span>
@@ -74,8 +76,9 @@
 
     <div class="produk-header">
         <h3>Daftar Produk</h3>
-        <button class="btn-hapus-data" onclick="hapusSemuaProduk()">🗑️ HAPUS SEMUA</button>
-        <button class="btn-laporan" onclick="bukaLaporan()">📊 LAPORAN</button>
+        <button class="btn-header btn-setting" onclick="bukaSetting()">⚙️ PENGATURAN</button>
+        <button class="btn-header btn-hapus-data" onclick="hapusSemuaProduk()">🗑️ HAPUS SEMUA</button>
+        <button class="btn-header btn-laporan" onclick="bukaLaporan()">📊 LAPORAN</button>
     </div>
 
     <div class="kategori" id="listKategori">
@@ -99,6 +102,7 @@
 
     <button class="btn-add-produk" onclick="bukaModalTambah()">+</button>
 
+    <!-- MODAL LOGIN -->
     <div id="modalLogin" class="modal" style="display:block">
         <div class="modal-content">
             <h3>Login Kasir</h3>
@@ -107,6 +111,18 @@
         </div>
     </div>
 
+    <!-- MODAL PENGATURAN -->
+    <div id="modalSetting" class="modal">
+        <div class="modal-content">
+            <h3>Pengaturan Toko</h3>
+            <label>Nama Toko:</label>
+            <input type="text" id="inputNamaToko" placeholder="Contoh: TOKO BUDI">
+            <button class="btn-bayar" style="background:#4CAF50;margin-top:10px" onclick="simpanSetting()">SIMPAN</button>
+            <button class="btn-bayar" style="background:#ccc;color:#333;margin-top:10px" onclick="tutupSetting()">BATAL</button>
+        </div>
+    </div>
+
+    <!-- MODAL TAMBAH PRODUK -->
     <div id="modalTambah" class="modal">
         <div class="modal-content">
             <h3>Tambah Produk Baru</h3>
@@ -126,6 +142,7 @@
         </div>
     </div>
 
+    <!-- MODAL BAYAR -->
     <div id="modalBayar" class="modal">
         <div class="modal-content">
             <h3 style="text-align:center">Total: Rp <span id="totalBayar">0</span></h3>
@@ -136,6 +153,7 @@
         </div>
     </div>
 
+    <!-- MODAL CASH -->
     <div id="modalCash" class="modal">
         <div class="modal-content">
             <h3>Pembayaran Tunai</h3>
@@ -147,6 +165,7 @@
         </div>
     </div>
 
+    <!-- MODAL LAPORAN -->
     <div id="modalLaporan" class="modal">
         <div class="modal-content">
             <h3>Laporan Penjualan</h3>
@@ -163,8 +182,11 @@ let keranjang = [];
 let laporan = JSON.parse(localStorage.getItem('laporanJual')) || [];
 let kategoriAktif = 'Semua';
 let namaKasir = localStorage.getItem('namaKasir') || '';
+let namaToko = localStorage.getItem('namaToko') || 'TOKO ANIS';
 let html5QrCode;
 const beepSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'.replace('...','uT19q'));
+
+document.getElementById('namaToko').innerText = namaToko;
 
 if (namaKasir) {
     document.getElementById('namaKasir').innerText = namaKasir;
@@ -172,6 +194,21 @@ if (namaKasir) {
     renderProduk();
 } else {
     document.getElementById('modalLogin').style.display = 'block';
+}
+
+function bukaSetting() {
+    document.getElementById('inputNamaToko').value = namaToko;
+    document.getElementById('modalSetting').style.display = 'block';
+}
+function tutupSetting() { document.getElementById('modalSetting').style.display = 'none'; }
+function simpanSetting() {
+    const namaBaru = document.getElementById('inputNamaToko').value;
+    if(!namaBaru) return alert('Nama toko ga boleh kosong!');
+    namaToko = namaBaru;
+    localStorage.setItem('namaToko', namaToko);
+    document.getElementById('namaToko').innerText = namaToko;
+    tutupSetting();
+    alert('Nama toko berhasil diubah!');
 }
 
 function loginKasir() {
@@ -382,4 +419,4 @@ function hapusLaporan() {
 renderProduk();
 </script>
 </body>
-            </html>
+    </html>
