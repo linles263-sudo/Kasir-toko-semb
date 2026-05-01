@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir Toko Anis Pro Max</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f0f2f5; padding: 8px; padding-bottom: 120px; }
+       .header { background: linear-gradient(135deg, #25D366, #128C7E); color: white; padding: 20px; text-align: center; border-radius: 15px; margin-bottom: 10px; }
+       .header h1 { font-size: 22px; }
+        #reader { width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 10px; border: 3px solid #fff; }
+       .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: bold; margin: 5px 0; }
+       .btn-scan { background: #007bff; color: white; }
+       .btn-stop { background: #dc3545; color: white; }
+       .btn-wa { background: #25D366; color: white; position: fixed; bottom: 10px; left: 8px; right: 8px; width: auto; z-index: 100; }
+       .manual { display: flex; gap: 5px; margin: 10px 0; }
+       .manual input { flex: 1; padding: 14px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
+       .search-box { margin: 15px 0 10px 0; }
+       .search-box input { width: 100%; padding: 14px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; }
+       .kategori { display: flex; gap: 8px; overflow-x: auto; padding: 5px 0 15px 0; }
+       .kategori button { padding: 10px 18px; border: none; background: #fff; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+       .kategori button.active { background: #007bff; color: white; }
+       .produk-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+       .produk-card { background: white; padding: 10px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+       .produk-img { width: 100%; height: 110px; border-radius: 8px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; font-size: 50px; font-weight: bold; color: white; }
+       .produk-nama { font-weight: 600; font-size: 14px; height: 40px; overflow: hidden; }
+       .produk-harga { color: #007bff; font-weight: bold; margin: 5px 0; }
+       .btn-tambah { background: #25D366; color: white; border: none; padding: 8px; border-radius: 8px; font-weight: bold; width: 100%; }
+       .keranjang { background: white; padding: 15px; border-radius: 12px; margin-top: 15px; }
+       .item { display: flex; gap: 10px; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+       .item-img { width: 50px; height: 50px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; font-weight: bold; }
+       .item-info { flex: 1; }
+       .item-nama { font-weight: bold; font-size: 14px; }
+       .item-harga { color: #666; font-size: 13px; }
+       .qty { display: flex; align-items: center; gap: 8px; }
+       .qty button { width: 32px; height: 32px; border: none; background: #007bff; color: white; border-radius: 8px; font-size: 18px; }
+       .total { font-size: 24px; font-weight: bold; text-align: right; margin: 15px 0; }
+       .icon-keranjang { position: fixed; top: 20px; right: 20px; background: #ff3b30; color: white; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; z-index: 99; }
+       .kosong { text-align: center; color: #999; padding: 20px; grid-column: 1 / -1; }
+       .hapus-semua { background: #dc3545; color: white; padding: 8px; border: none; border-radius: 8px; font-size: 12px; float: right; }
+    </style>
+</head>
+<body>
+    <div class="icon-keranjang" id="jumlahItem">0</div>
+    <div class="header">
+        <h1>📱 KASIR TOKO ANIS PRO MAX</h1>
+        <p>Scan atau tap produk</p>
+    </div>
+
+    <div id="reader"></div>
+    <button class="btn btn-scan" id="btnStart">▶️ Mulai Scan Kamera</button>
+    <button class="btn btn-stop" id="btnStop" style="display:none;">⏹️ Stop Kamera</button>
+
+    <div class="manual">
+        <input type="text" id="inputManual" placeholder="Ketik barcode manual lalu Enter">
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="cariProduk" placeholder="🔍 Cari nama produk...">
+    </div>
+
+    <div class="kategori" id="kategoriTab">
+        <button class="active" onclick="filterKategori('Semua')">Semua</button>
+        <button onclick="filterKategori('Rokok')">Rokok</button>
+        <button onclick="filterKategori('Minuman')">Minuman</button>
+        <button onclick="filterKategori('Sembako')">Sembako</button>
+        <button onclick="filterKategori('Snack')">Snack</button>
+    </div>
+
+    <div class="produk-grid" id="daftarProduk"></div>
+
+    <div class="keranjang">
+        <h3>🛒 Keranjang <button class="hapus-semua" onclick="hapusSemua()">Hapus Semua</button></h3>
+        <div id="listKeranjang"><p class="kosong">Belum ada barang</p></div>
+        <div class="total">Total: Rp<span id="totalHarga">0</span></div>
+    </div>
+    
+    <button class="btn btn-wa" onclick="checkoutWA()">💬 BAYAR VIA WHATSAPP</button>
+
+<script>
+    // ===== 1. GANTI NOMOR WA TOKO DI SINI =====
+    const nomorTokoAnis = "6281234567890"; 
+
+    // ===== 2. DATABASE PRODUK PAKE EMOJI + WARNA. ANTI BLOKIR =====
+    const databaseProduk = {
+        // SEMBAKO
+        "8992388111208": { nama: "Indomie Goreng", harga: 3500, kategori: "Sembako", emoji: "🍜", warna: "#FF6B6B" },
+        "8991002100013": { nama: "Beras 5kg", harga: 65000, kategori: "Sembako", emoji: "🌾", warna: "#4ECDC4" },
+        "8992770011015": { nama: "Gula Pasir 1kg", harga: 17500, kategori: "Sembako", emoji: "🍬", warna: "#FFE66D" },
+        "8997012345678": { nama: "Minyak Goreng 1L", harga: 18000, kategori: "Sembako", emoji: "🛢️", warna: "#FFD93D" },
+        "8997023456789": { nama: "Telur 1kg", harga: 28000, kategori: "Sembako", emoji: "🥚", warna: "#F4A261" },
+        
+        // MINUMAN
+        "8992761121029": { nama: "Aqua 600ml", harga: 4000, kategori: "Minuman", emoji: "💧", warna: "#1A8FE3" },
+        "8997027770015": { nama: "Teh Pucuk 350ml", harga: 4000, kategori: "Minuman", emoji: "🍵", warna: "#95E1D3" },
+        "8997034567890": { nama: "Coca Cola 390ml", harga: 6000, kategori: "Minuman", emoji: "🥤", warna: "#E63946" },
+        "8997045678901": { nama: "Pocari Sweat 350ml", harga: 7000, kategori: "Minuman", emoji: "🧃", warna: "#A8DADC" },
+        "8997056789012": { nama: "Kopi Kapal Api", harga: 2000, kategori: "Minuman", emoji: "☕", warna: "#6A4A3C" },
+        
+        // ROKOK
+        "8991001111018": { nama: "Surya 12", harga: 25000, kategori: "Rokok", emoji: "🚬", warna: "#D62828" },
+        "8991001111025": { nama: "Surya 16", harga: 32000, kategori: "Rokok", emoji: "🚬", warna: "#D62828" },
+        "8991001221021": { nama: "Gudang Garam Filter 16", harga: 30000, kategori: "Rokok", emoji: "🚬", warna: "#003049" },
+        "8991001441018": { nama: "Sampoerna Mild 16", harga: 35000, kategori: "Rokok", emoji: "🚬", warna: "#588157" },
+        "8991001551015": { nama: "Marlboro Merah 20", harga: 40000, kategori: "Rokok", emoji: "🚬", warna: "#C1121F" },
+        "8991001661012": { nama: "Djarum Super 16", harga: 28000, kategori: "Rokok", emoji: "🚬", warna: "#540B0E" },
+        "8991001771019": { nama: "LA Lights 16", harga: 33000, kategori: "Rokok", emoji: "🚬", warna: "#457B9D" },
+        
+        // SNACK
+        "8992761220012": { nama: "Chitato 68gr", harga: 10000, kategori: "Snack", emoji: "🍟", warna: "#F77F00" },
+        "8997067890123": { nama: "Qtela 180gr", harga: 12000, kategori: "Snack", emoji: "🍘", warna: "#FCBF49" },
+        "8997078901234": { nama: "Tango 130gr", harga: 11000, kategori: "Snack", emoji: "🍪", warna: "#9D4EDD" },
+        "8997089012345": { nama: "Beng Beng", harga: 2000, kategori: "Snack", emoji: "🍫", warna: "#E76F51" },
+        "8997090123456": { nama: "Silverqueen 65gr", harga: 15000, kategori: "Snack", emoji: "🍫", warna: "#8B4513" },
+    };
+
+    let keranjang = [];
+    let html5QrcodeScanner;
+    let kategoriAktif = 'Semua';
+
+    function renderDaftarProduk() {
+        const list = document.getElementById('daftarProduk');
+        const keyword = document.getElementById('cariProduk').value.toLowerCase();
+        
+        const produk = Object.entries(databaseProduk).filter(([barcode, item]) => {
+            const cocokKategori = kategoriAktif === 'Semua' || item.kategori === kategoriAktif;
+            const cocokCari = item.nama.toLowerCase().includes(keyword);
+            return cocokKategori && cocokCari;
+        });
+        
+        if(produk.length === 0){
+            list.innerHTML = '<p class="kosong">Produk tidak ditemukan</p>';
+            return;
+        }
+
+        list.innerHTML = produk.map(([barcode, item]) => `
+            <div class="produk-card">
+                <div class="produk-img" style="background:${item.warna}">${item.emoji}</div>
+                <div class="produk-nama">${item.nama}</div>
+                <div class="produk-harga">Rp${item.harga.toLocaleString('id-ID')}</div>
+                <button class="btn-tambah" onclick="tambahProduk('${barcode}')">+ Tambah</button>
+            </div>
+        `).join('');
+    }
+
+    function filterKategori(kat) {
+        kategoriAktif = kat;
+        document.querySelectorAll('.kategori button').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        renderDaftarProduk();
+    }
+
+    document.getElementById('cariProduk').addEventListener('input', renderDaftarProduk);
+
+    document.getElementById('btnStart').addEventListener('click', () => {
+        html5QrcodeScanner = new Html5Qrcode("reader");
+        html5QrcodeScanner.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, onScanSuccess);
+        document.getElementById('btnStart').style.display = 'none';
+        document.getElementById('btnStop').style.display = 'block';
+    });
+
+    document.getElementById('btnStop').addEventListener('click', () => {
+        html5QrcodeScanner.stop();
+        document.getElementById('btnStart').style.display = 'block';
+        document.getElementById('btnStop').style.display = 'none';
+    });
+
+    document.getElementById('inputManual').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') { onScanSuccess(this.value); this.value = ''; }
+    });
+
+    function onScanSuccess(decodedText) {
+        navigator.vibrate(200);
+        tambahProduk(decodedText);
+    }
+
+    function tambahProduk(barcode) {
+        const produk = databaseProduk[barcode];
+        if (!produk) { alert('Produk tidak ditemukan!'); return; }
+        const item = keranjang.find(i => i.barcode === barcode);
+        if (item) { item.qty++; } else { keranjang.push({ barcode,...produk, qty: 1 }); }
+        updateKeranjang();
+    }
+
+    function ubahQty(barcode, jumlah) {
+        const item = keranjang.find(i => i.barcode === barcode);
+        if (item) {
+            item.qty += jumlah;
+            if (item.qty <= 0) { keranjang = keranjang.filter(i => i.barcode!== barcode); }
+        }
+        updateKeranjang();
+    }
+
+    function hapusSemua() {
+        if(confirm('Hapus semua isi keranjang?')) {
+            keranjang = [];
+            updateKeranjang();
+        }
+    }
+
+    function updateKeranjang() {
+        const list = document.getElementById('listKeranjang');
+        const totalEl = document.getElementById('totalHarga');
+        const jumlahEl = document.getElementById('jumlahItem');
+
+        if (keranjang.length === 0) {
+            list.innerHTML = '<p class="kosong">Belum ada barang</p>';
+            totalEl.innerText = '0';
+            jumlahEl.innerText = '0';
+            return;
+        }
+
+        let total = 0, totalItem = 0;
+        list.innerHTML = keranjang.map(item => {
+            total += item.harga * item.qty;
+            totalItem += item.qty;
+            return `
+                <div class="item">
+                    <div class="item-img" style="background:${item.warna}">${item.emoji}</div>
+                    <div class="item-info">
+                        <div class="item-nama">${item.nama}</div>
+                        <div class="item-harga">Rp${item.harga.toLocaleString('id-ID')}</div>
+                    </div>
+                    <div class="qty">
+                        <button onclick="ubahQty('${item.barcode}', -1)">-</button>
+                        <span>${item.qty}</span>
+                        <button onclick="ubahQty('${item.barcode}', 1)">+</button>
+                    </div>
+                </div>`;
+        }).join('');
+
+        totalEl.innerText = total.toLocaleString('id-ID');
+        jumlahEl.innerText = totalItem;
+    }
+
+    function checkoutWA() {
+        if (keranjang.length === 0) { alert('Keranjang masih kosong!'); return; }
+        let pesan = `*STRUK TOKO ANIS*\n\n`;
+        let total = 0;
+        keranjang.forEach(item => {
+            const subtotal = item.harga * item.qty;
+            total += subtotal;
+            pesan += `${item.nama}\n${item.qty} x Rp${item.harga.toLocaleString('id-ID')} = Rp${subtotal.toLocaleString('id-ID')}\n\n`;
+        });
+        pesan += `*TOTAL: Rp${total.toLocaleString('id-ID')}*\n\nTerima kasih 🙏`;
+        window.open(`https://wa.me/${nomorTokoAnis}?text=${encodeURIComponent(pesan)}`, '_blank');
+    }
+
+    renderDaftarProduk();
+</script>
+</body>
+</html>
