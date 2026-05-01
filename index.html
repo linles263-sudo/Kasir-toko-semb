@@ -12,7 +12,7 @@
         .header .title h1 { font-size: 14px; font-weight: normal; }
         .header .title h2 { font-size: 24px; }
         .header .kasir-info { text-align: right; font-size: 14px; }
-        .header .cart-icon { background: #ffca28; color: black; padding: 8px; border-radius: 50%; position: relative; }
+        .header .cart-icon { background: #ffca28; color: black; padding: 8px; border-radius: 50%; position: relative; display: inline-block; margin-left: 8px; }
         .header .cart-count { position: absolute; top: -5px; right: -5px; background: #ffca28; color: black; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .scan-area { background: #4CAF50; padding: 15px; margin: 15px; border-radius: 10px; text-align: center; color: white; }
         .scan-area h3 { font-size: 18px; }
@@ -40,6 +40,12 @@
         .modal-content { background: white; margin: 15% auto; padding: 20px; width: 90%; border-radius: 10px; max-height: 75vh; overflow-y: auto; }
         .modal input, .modal select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
         .kosong { text-align: center; padding: 40px 20px; color: #757575; }
+        .laporan-item { border-bottom: 1px solid #eee; padding: 10px 0; font-size: 14px; }
+        .btn-metode { width: 100%; margin: 8px 0; font-size: 18px; padding: 15px; border-radius: 8px; border: none; font-weight: bold; }
+        .btn-cash { background: #4CAF50; color: white; }
+        .btn-debit { background: #2196F3; color: white; }
+        .btn-qr { background: #FF9800; color: white; }
+        .kembalian { font-size: 24px; color: #d32f2f; text-align: center; margin: 15px 0; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -71,17 +77,15 @@
     </div>
 
     <div class="kategori" id="listKategori">
-        <button class="kategori-btn aktif" onclick="filterKategori('Semua')">Semua</button>
-        <button class="kategori-btn" onclick="filterKategori('Rokok')">Rokok</button>
-        <button class="kategori-btn" onclick="filterKategori('Minuman')">Minuman</button>
-        <button class="kategori-btn" onclick="filterKategori('Mie')">Mie</button>
-        <button class="kategori-btn" onclick="filterKategori('Snack')">Snack</button>
-        <button class="kategori-btn" onclick="filterKategori('Lainnya')">Lainnya</button>
+        <button class="kategori-btn aktif" onclick="filterKategori('Semua', this)">Semua</button>
+        <button class="kategori-btn" onclick="filterKategori('Rokok', this)">Rokok</button>
+        <button class="kategori-btn" onclick="filterKategori('Minuman', this)">Minuman</button>
+        <button class="kategori-btn" onclick="filterKategori('Mie', this)">Mie</button>
+        <button class="kategori-btn" onclick="filterKategori('Snack', this)">Snack</button>
+        <button class="kategori-btn" onclick="filterKategori('Lainnya', this)">Lainnya</button>
     </div>
 
-    <div class="list-produk" id="listProduk">
-        <div class="kosong">Belum ada produk. Pencet tombol + untuk tambah.</div>
-    </div>
+    <div class="list-produk" id="listProduk"></div>
 
     <div class="footer">
         <div class="subtotal">
@@ -122,28 +126,59 @@
         </div>
     </div>
 
-    <!-- MODAL LAINNYA SAMA KAYAK SEBELUMNYA -->
-    <div id="modalBayar" class="modal"> ... </div>
-    <div id="modalLaporan" class="modal"> ... </div>
+    <!-- MODAL BAYAR -->
+    <div id="modalBayar" class="modal">
+        <div class="modal-content">
+            <h3 style="text-align:center">Total: Rp <span id="totalBayar">0</span></h3>
+            <button class="btn-metode btn-cash" onclick="pilihCash()">💵 CASH</button>
+            <button class="btn-metode btn-debit" onclick="pilihDebit()">💳 DEBIT</button>
+            <button class="btn-metode btn-qr" onclick="pilihQR()">📱 QRIS</button>
+            <button class="btn-bayar" style="background:#ccc;color:#333;margin-top:15px" onclick="tutupModalBayar()">TUTUP</button>
+        </div>
+    </div>
+
+    <!-- MODAL CASH -->
+    <div id="modalCash" class="modal">
+        <div class="modal-content">
+            <h3>Pembayaran Tunai</h3>
+            <p>Total: Rp <span id="totalCash">0</span></p>
+            <input type="number" id="uangDiterima" placeholder="Uang Diterima" oninput="hitungKembalian()">
+            <div class="kembalian">Kembalian: Rp <span id="kembalian">0</span></div>
+            <button class="btn-bayar" style="background:#4CAF50" onclick="selesaiBayar('Cash')">SELESAI</button>
+            <button class="btn-bayar" style="background:#ccc;color:#333;margin-top:10px" onclick="tutupModalCash()">BATAL</button>
+        </div>
+    </div>
+
+    <!-- MODAL LAPORAN -->
+    <div id="modalLaporan" class="modal">
+        <div class="modal-content">
+            <h3>Laporan Penjualan Hari Ini</h3>
+            <div id="isiLaporan"></div>
+            <h4 style="margin-top:15px">Total Omzet: Rp <span id="totalOmzet">0</span></h4>
+            <button class="btn-bayar" style="background:#d32f2f;margin-top:15px" onclick="hapusLaporan()">HAPUS LAPORAN</button>
+            <button class="btn-bayar" style="background:#ccc;color:#333;margin-top:10px" onclick="tutupLaporan()">TUTUP</button>
+        </div>
+    </div>
 
 <script>
-// PRODUK KOSONG. PEMILIK TOKO ISI SENDIRI
 let produk = JSON.parse(localStorage.getItem('daftarProduk')) || [];
 let keranjang = [];
+let laporan = JSON.parse(localStorage.getItem('laporanJual')) || [];
 let kategoriAktif = 'Semua';
 let namaKasir = localStorage.getItem('namaKasir') || '';
 let html5QrCode;
 
-// LOGIN
 if (namaKasir) {
     document.getElementById('namaKasir').innerText = namaKasir;
     document.getElementById('modalLogin').style.display = 'none';
     renderProduk();
+} else {
+    document.getElementById('modalLogin').style.display = 'block';
 }
 
 function loginKasir() {
     const nama = document.getElementById('inputNamaKasir').value;
-    if (!nama) return alert('Isi nama!');
+    if (!nama) return alert('Isi nama dulu!');
     namaKasir = nama;
     localStorage.setItem('namaKasir', nama);
     document.getElementById('namaKasir').innerText = nama;
@@ -152,21 +187,20 @@ function loginKasir() {
 }
 
 function logout() {
-    localStorage.removeItem('namaKasir');
-    location.reload();
+    if (confirm('Yakin logout?')) {
+        localStorage.removeItem('namaKasir');
+        location.reload();
+    }
 }
 
-// RENDER PRODUK
 function renderProduk() {
     const list = document.getElementById('listProduk');
     list.innerHTML = '';
     let produkFilter = kategoriAktif === 'Semua' ? produk : produk.filter(p => p.kategori === kategoriAktif);
-    
     if(produkFilter.length === 0) {
-        list.innerHTML = '<div class="kosong">Belum ada produk di kategori ini.<br>Pencet tombol + untuk tambah.</div>';
+        list.innerHTML = '<div class="kosong">Belum ada produk.<br>Pencet tombol + untuk tambah.</div>';
         return;
     }
-    
     produkFilter.forEach(item => {
         list.innerHTML += `
         <div class="item-produk">
@@ -182,26 +216,24 @@ function renderProduk() {
     });
 }
 
-function filterKategori(kat) {
+function filterKategori(kat, el) {
     kategoriAktif = kat;
     document.querySelectorAll('.kategori-btn').forEach(btn => btn.classList.remove('aktif'));
-    event.target.classList.add('aktif');
+    el.classList.add('aktif');
     renderProduk();
 }
 
-// TAMBAH PRODUK
 function bukaModalTambah() { document.getElementById('modalTambah').style.display = 'block'; }
 function tutupModalTambah() { document.getElementById('modalTambah').style.display = 'none'; }
+
 function simpanProduk() {
     const nama = document.getElementById('namaBarang').value;
     const harga = parseInt(document.getElementById('hargaBarang').value);
     const stok = parseInt(document.getElementById('stokBarang').value);
     const barcode = document.getElementById('barcodeBarang').value;
     const kategori = document.getElementById('kategoriBarang').value;
-    
     if (!nama || !harga || !stok || !barcode) return alert('Lengkapi semua!');
     if (produk.find(p => p.barcode == barcode)) return alert('Barcode sudah ada!');
-    
     produk.push({ id: Date.now(), barcode, nama, harga, stok, kategori });
     localStorage.setItem('daftarProduk', JSON.stringify(produk));
     tutupModalTambah();
@@ -212,7 +244,6 @@ function simpanProduk() {
     document.getElementById('barcodeBarang').value = '';
 }
 
-// SCAN
 function mulaiScan() {
     document.getElementById('reader').style.display = 'block';
     document.getElementById('statusScan').innerText = 'Arahkan ke barcode...';
@@ -229,13 +260,116 @@ function onScanSuccess(decodedText) {
     else alert('Barang tidak ditemukan! Tambah dulu via tombol +');
 }
 
-// KERANJANG & BAYAR - SAMA KAYAK SEBELUMNYA
-function tambahKeranjang(id) { ... }
-function updateKeranjang() { ... }
-function resetKeranjang() { ... }
-function bukaBayar() { ... }
-// ... dst, copy dari kode sebelumnya
+function tambahKeranjang(id) {
+    const barang = produk.find(p => p.id === id);
+    if (barang.stok <= 0) return alert('Stok habis!');
+    const diKeranjang = keranjang.find(k => k.id === id);
+    if (diKeranjang) diKeranjang.qty++;
+    else keranjang.push({ ...barang, qty: 1 });
+    updateKeranjang();
+}
 
+function updateKeranjang() {
+    const totalEl = document.getElementById('totalHarga');
+    const jumlahEl = document.getElementById('jumlahItem');
+    let total = 0, jumlah = 0;
+    keranjang.forEach(item => {
+        total += item.harga * item.qty;
+        jumlah += item.qty;
+    });
+    totalEl.innerText = total.toLocaleString('id-ID');
+    jumlahEl.innerText = jumlah;
+    document.getElementById('totalBayar').innerText = total.toLocaleString('id-ID');
+    document.getElementById('totalCash').innerText = total.toLocaleString('id-ID');
+}
+
+function resetKeranjang() {
+    if (confirm('Kosongkan keranjang?')) {
+        keranjang = [];
+        updateKeranjang();
+    }
+}
+
+function bukaBayar() {
+    if(keranjang.length === 0) return alert('Keranjang kosong!');
+    document.getElementById('modalBayar').style.display = 'block';
+}
+function tutupModalBayar() { document.getElementById('modalBayar').style.display = 'none'; }
+
+function pilihCash() {
+    tutupModalBayar();
+    document.getElementById('modalCash').style.display = 'block';
+    document.getElementById('uangDiterima').value = '';
+    document.getElementById('kembalian').innerText = '0';
+}
+function tutupModalCash() { document.getElementById('modalCash').style.display = 'none'; }
+
+function hitungKembalian() {
+    const total = keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
+    const bayar = parseInt(document.getElementById('uangDiterima').value) || 0;
+    const kembali = bayar - total;
+    document.getElementById('kembalian').innerText = kembali > 0 ? kembali.toLocaleString('id-ID') : '0';
+}
+
+function pilihDebit() { tutupModalBayar(); selesaiBayar('Debit'); }
+function pilihQR() { tutupModalBayar(); selesaiBayar('QRIS'); }
+
+function selesaiBayar(metode) {
+    const total = keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
+    const transaksi = {
+        waktu: new Date().toLocaleString('id-ID'),
+        kasir: namaKasir,
+        total: total,
+        metode: metode,
+        items: [...keranjang]
+    };
+    laporan.push(transaksi);
+    localStorage.setItem('laporanJual', JSON.stringify(laporan));
+    
+    // Kurangi stok
+    keranjang.forEach(item => {
+        const prod = produk.find(p => p.id === item.id);
+        if (prod) prod.stok -= item.qty;
+    });
+    localStorage.setItem('daftarProduk', JSON.stringify(produk));
+    
+    alert(`Transaksi ${metode} BERHASIL!\nTotal: Rp ${total.toLocaleString('id-ID')}`);
+    keranjang = [];
+    updateKeranjang();
+    renderProduk();
+    tutupModalCash();
+}
+
+function bukaLaporan() {
+    const div = document.getElementById('isiLaporan');
+    const totalOmzet = document.getElementById('totalOmzet');
+    div.innerHTML = '';
+    let omzet = 0;
+    if(laporan.length === 0) {
+        div.innerHTML = '<p>Belum ada transaksi hari ini</p>';
+    } else {
+        laporan.forEach((trx, i) => {
+            omzet += trx.total;
+            div.innerHTML += `<div class="laporan-item">
+                <b>#${i+1} - ${trx.waktu}</b><br>
+                Kasir: ${trx.kasir} | ${trx.metode}<br>
+                Total: Rp ${trx.total.toLocaleString('id-ID')}
+            </div>`;
+        });
+    }
+    totalOmzet.innerText = omzet.toLocaleString('id-ID');
+    document.getElementById('modalLaporan').style.display = 'block';
+}
+function tutupLaporan() { document.getElementById('modalLaporan').style.display = 'none'; }
+function hapusLaporan() {
+    if(confirm('Yakin hapus semua laporan?')) {
+        laporan = [];
+        localStorage.setItem('laporanJual', JSON.stringify(laporan));
+        bukaLaporan();
+    }
+}
+
+renderProduk();
 </script>
 </body>
         </html>
