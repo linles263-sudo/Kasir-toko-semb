@@ -19,9 +19,10 @@
         .scan-buttons { display: flex; justify-content: space-around; margin-top: 10px; }
         .scan-btn { background: white; color: #4CAF50; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         #reader { width: 100%; margin-top: 10px; border-radius: 8px; display: none; }
-        .produk-header { display: flex; justify-content: space-between; align-items: center; padding: 0 15px; margin-top: 15px; }
+        .produk-header { display: flex; justify-content: space-between; align-items: center; padding: 0 15px; margin-top: 15px; gap: 8px; }
         .produk-header h3 { font-size: 18px; }
         .btn-laporan { background: #2196F3; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+        .btn-hapus-data { background: #d32f2f; color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
         .kategori { display: flex; overflow-x: auto; padding: 10px 15px; gap: 10px; }
         .kategori-btn { background: #e0e0e0; border: none; padding: 8px 15px; border-radius: 20px; white-space: nowrap; }
         .kategori-btn.aktif { background: #333; color: white; }
@@ -73,6 +74,7 @@
 
     <div class="produk-header">
         <h3>Daftar Produk</h3>
+        <button class="btn-hapus-data" onclick="hapusSemuaProduk()">🗑️ HAPUS SEMUA</button>
         <button class="btn-laporan" onclick="bukaLaporan()">📊 LAPORAN</button>
     </div>
 
@@ -97,7 +99,6 @@
 
     <button class="btn-add-produk" onclick="bukaModalTambah()">+</button>
 
-    <!-- MODAL LOGIN -->
     <div id="modalLogin" class="modal" style="display:block">
         <div class="modal-content">
             <h3>Login Kasir</h3>
@@ -106,7 +107,6 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH PRODUK -->
     <div id="modalTambah" class="modal">
         <div class="modal-content">
             <h3>Tambah Produk Baru</h3>
@@ -126,7 +126,6 @@
         </div>
     </div>
 
-    <!-- MODAL BAYAR -->
     <div id="modalBayar" class="modal">
         <div class="modal-content">
             <h3 style="text-align:center">Total: Rp <span id="totalBayar">0</span></h3>
@@ -137,7 +136,6 @@
         </div>
     </div>
 
-    <!-- MODAL CASH -->
     <div id="modalCash" class="modal">
         <div class="modal-content">
             <h3>Pembayaran Tunai</h3>
@@ -149,7 +147,6 @@
         </div>
     </div>
 
-    <!-- MODAL LAPORAN -->
     <div id="modalLaporan" class="modal">
         <div class="modal-content">
             <h3>Laporan Penjualan</h3>
@@ -161,15 +158,12 @@
     </div>
 
 <script>
-// FIX 1: KOSONGIN PRODUK + HAPUS SAMPAH NYANGKUT
-localStorage.removeItem('db'); // Hapus data lama
 let produk = JSON.parse(localStorage.getItem('daftarProduk')) || [];
 let keranjang = [];
 let laporan = JSON.parse(localStorage.getItem('laporanJual')) || [];
 let kategoriAktif = 'Semua';
 let namaKasir = localStorage.getItem('namaKasir') || '';
 let html5QrCode;
-// FIX 2: SUARA BEEP BALIK
 const beepSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'.replace('...','uT19q'));
 
 if (namaKasir) {
@@ -190,7 +184,6 @@ function loginKasir() {
     renderProduk();
 }
 
-// FIX 3: LOGOUT BENERAN JALAN
 function logout() {
     if (confirm('Yakin mau logout?')) {
         localStorage.removeItem('namaKasir');
@@ -198,6 +191,15 @@ function logout() {
         updateKeranjang();
         document.getElementById('modalLogin').style.display = 'block';
         document.getElementById('inputNamaKasir').value = '';
+    }
+}
+
+function hapusSemuaProduk() {
+    if(confirm('Yakin hapus SEMUA produk? Data ga bisa balik!')) {
+        localStorage.removeItem('daftarProduk');
+        produk = [];
+        renderProduk();
+        alert('Semua produk udah dihapus. Silakan tambah baru via tombol +');
     }
 }
 
@@ -263,7 +265,7 @@ function onScanSuccess(decodedText) {
     html5QrCode.stop();
     document.getElementById('reader').style.display = 'none';
     document.getElementById('statusScan').innerText = 'Siap scan...';
-    beepSound.play().catch(e=>{}); // BUNYI BEEP BALIK
+    beepSound.play().catch(e=>{});
     const item = produk.find(p => p.barcode == decodedText);
     if(item) tambahKeranjang(item.id);
     else alert('Barang tidak ditemukan! Tambah dulu via tombol +');
@@ -380,4 +382,4 @@ function hapusLaporan() {
 renderProduk();
 </script>
 </body>
-    </html>
+            </html>
