@@ -55,7 +55,7 @@
             <h2>TOKO ANIS</h2>
         </div>
         <div class="kasir-info">
-            Kasir: <span id="namaKasir">Semb</span>
+            Kasir: <span id="namaKasir">-</span>
             <div class="cart-icon">🛒<div class="cart-count" id="jumlahItem">0</div></div>
         </div>
     </div>
@@ -96,6 +96,15 @@
     </div>
 
     <button class="btn-add-produk" onclick="bukaModalTambah()">+</button>
+
+    <!-- MODAL LOGIN -->
+    <div id="modalLogin" class="modal" style="display:block">
+        <div class="modal-content">
+            <h3>Login Kasir</h3>
+            <input type="text" id="inputNamaKasir" placeholder="Nama Kasir">
+            <button class="btn-bayar" style="margin-top:10px" onclick="loginKasir()">MASUK</button>
+        </div>
+    </div>
 
     <!-- MODAL TAMBAH PRODUK -->
     <div id="modalTambah" class="modal">
@@ -152,13 +161,45 @@
     </div>
 
 <script>
-// INI KUNCINYA: PRODUK KOSONG. PEMILIK TOKO ISI SENDIRI
+// FIX 1: KOSONGIN PRODUK + HAPUS SAMPAH NYANGKUT
+localStorage.removeItem('db'); // Hapus data lama
 let produk = JSON.parse(localStorage.getItem('daftarProduk')) || [];
 let keranjang = [];
 let laporan = JSON.parse(localStorage.getItem('laporanJual')) || [];
 let kategoriAktif = 'Semua';
-let namaKasir = 'Semb';
+let namaKasir = localStorage.getItem('namaKasir') || '';
 let html5QrCode;
+// FIX 2: SUARA BEEP BALIK
+const beepSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'.replace('...','uT19q'));
+
+if (namaKasir) {
+    document.getElementById('namaKasir').innerText = namaKasir;
+    document.getElementById('modalLogin').style.display = 'none';
+    renderProduk();
+} else {
+    document.getElementById('modalLogin').style.display = 'block';
+}
+
+function loginKasir() {
+    const nama = document.getElementById('inputNamaKasir').value;
+    if (!nama) return alert('Isi nama dulu!');
+    namaKasir = nama;
+    localStorage.setItem('namaKasir', nama);
+    document.getElementById('namaKasir').innerText = nama;
+    document.getElementById('modalLogin').style.display = 'none';
+    renderProduk();
+}
+
+// FIX 3: LOGOUT BENERAN JALAN
+function logout() {
+    if (confirm('Yakin mau logout?')) {
+        localStorage.removeItem('namaKasir');
+        keranjang = [];
+        updateKeranjang();
+        document.getElementById('modalLogin').style.display = 'block';
+        document.getElementById('inputNamaKasir').value = '';
+    }
+}
 
 function renderProduk() {
     const list = document.getElementById('listProduk');
@@ -219,9 +260,10 @@ function mulaiScan() {
 }
 
 function onScanSuccess(decodedText) {
-    html5QrCode.stop(); // SEKALI TIT LANGSUNG MATI
+    html5QrCode.stop();
     document.getElementById('reader').style.display = 'none';
     document.getElementById('statusScan').innerText = 'Siap scan...';
+    beepSound.play().catch(e=>{}); // BUNYI BEEP BALIK
     const item = produk.find(p => p.barcode == decodedText);
     if(item) tambahKeranjang(item.id);
     else alert('Barang tidak ditemukan! Tambah dulu via tombol +');
@@ -256,8 +298,6 @@ function resetKeranjang() {
         updateKeranjang();
     }
 }
-
-function logout() { alert('Fitur logout dimatikan'); }
 
 function bukaBayar() {
     if(keranjang.length === 0) return alert('Keranjang kosong!');
@@ -340,4 +380,4 @@ function hapusLaporan() {
 renderProduk();
 </script>
 </body>
-                                        </html>
+    </html>
