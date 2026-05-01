@@ -55,7 +55,7 @@
             <h2>TOKO ANIS</h2>
         </div>
         <div class="kasir-info">
-            Kasir: <span id="namaKasir">-</span>
+            Kasir: <span id="namaKasir">Semb</span>
             <div class="cart-icon">🛒<div class="cart-count" id="jumlahItem">0</div></div>
         </div>
     </div>
@@ -96,15 +96,6 @@
     </div>
 
     <button class="btn-add-produk" onclick="bukaModalTambah()">+</button>
-
-    <!-- MODAL LOGIN -->
-    <div id="modalLogin" class="modal" style="display:block">
-        <div class="modal-content">
-            <h3>Login Kasir</h3>
-            <input type="text" id="inputNamaKasir" placeholder="Nama Kasir">
-            <button class="btn-bayar" style="margin-top:10px" onclick="loginKasir()">MASUK</button>
-        </div>
-    </div>
 
     <!-- MODAL TAMBAH PRODUK -->
     <div id="modalTambah" class="modal">
@@ -152,7 +143,7 @@
     <!-- MODAL LAPORAN -->
     <div id="modalLaporan" class="modal">
         <div class="modal-content">
-            <h3>Laporan Penjualan Hari Ini</h3>
+            <h3>Laporan Penjualan</h3>
             <div id="isiLaporan"></div>
             <h4 style="margin-top:15px">Total Omzet: Rp <span id="totalOmzet">0</span></h4>
             <button class="btn-bayar" style="background:#d32f2f;margin-top:15px" onclick="hapusLaporan()">HAPUS LAPORAN</button>
@@ -161,44 +152,20 @@
     </div>
 
 <script>
+// INI KUNCINYA: PRODUK KOSONG. PEMILIK TOKO ISI SENDIRI
 let produk = JSON.parse(localStorage.getItem('daftarProduk')) || [];
 let keranjang = [];
 let laporan = JSON.parse(localStorage.getItem('laporanJual')) || [];
 let kategoriAktif = 'Semua';
-let namaKasir = localStorage.getItem('namaKasir') || '';
+let namaKasir = 'Semb';
 let html5QrCode;
-
-if (namaKasir) {
-    document.getElementById('namaKasir').innerText = namaKasir;
-    document.getElementById('modalLogin').style.display = 'none';
-    renderProduk();
-} else {
-    document.getElementById('modalLogin').style.display = 'block';
-}
-
-function loginKasir() {
-    const nama = document.getElementById('inputNamaKasir').value;
-    if (!nama) return alert('Isi nama dulu!');
-    namaKasir = nama;
-    localStorage.setItem('namaKasir', nama);
-    document.getElementById('namaKasir').innerText = nama;
-    document.getElementById('modalLogin').style.display = 'none';
-    renderProduk();
-}
-
-function logout() {
-    if (confirm('Yakin logout?')) {
-        localStorage.removeItem('namaKasir');
-        location.reload();
-    }
-}
 
 function renderProduk() {
     const list = document.getElementById('listProduk');
     list.innerHTML = '';
     let produkFilter = kategoriAktif === 'Semua' ? produk : produk.filter(p => p.kategori === kategoriAktif);
     if(produkFilter.length === 0) {
-        list.innerHTML = '<div class="kosong">Belum ada produk.<br>Pencet tombol + untuk tambah.</div>';
+        list.innerHTML = '<div class="kosong">Belum ada produk.<br>Pencet tombol + untuk tambah barang.</div>';
         return;
     }
     produkFilter.forEach(item => {
@@ -252,7 +219,7 @@ function mulaiScan() {
 }
 
 function onScanSuccess(decodedText) {
-    html5QrCode.stop();
+    html5QrCode.stop(); // SEKALI TIT LANGSUNG MATI
     document.getElementById('reader').style.display = 'none';
     document.getElementById('statusScan').innerText = 'Siap scan...';
     const item = produk.find(p => p.barcode == decodedText);
@@ -290,6 +257,8 @@ function resetKeranjang() {
     }
 }
 
+function logout() { alert('Fitur logout dimatikan'); }
+
 function bukaBayar() {
     if(keranjang.length === 0) return alert('Keranjang kosong!');
     document.getElementById('modalBayar').style.display = 'block';
@@ -326,7 +295,6 @@ function selesaiBayar(metode) {
     laporan.push(transaksi);
     localStorage.setItem('laporanJual', JSON.stringify(laporan));
     
-    // Kurangi stok
     keranjang.forEach(item => {
         const prod = produk.find(p => p.id === item.id);
         if (prod) prod.stok -= item.qty;
@@ -346,7 +314,7 @@ function bukaLaporan() {
     div.innerHTML = '';
     let omzet = 0;
     if(laporan.length === 0) {
-        div.innerHTML = '<p>Belum ada transaksi hari ini</p>';
+        div.innerHTML = '<p>Belum ada transaksi</p>';
     } else {
         laporan.forEach((trx, i) => {
             omzet += trx.total;
@@ -372,4 +340,4 @@ function hapusLaporan() {
 renderProduk();
 </script>
 </body>
-        </html>
+                                        </html>
