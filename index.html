@@ -482,6 +482,73 @@ function filterKategori(kat) {
   event.target.classList.add('active');
   renderProduk(kat);
 }
+   // === FITUR KELOLA STOK ===
+let daftarBarang = JSON.parse(localStorage.getItem('db_barang')) || [];
+
+function bukaStok() {
+  document.getElementById('popupStok').style.display = 'block';
+  tampilkanBarang();
+}
+
+function tutupStok() {
+  document.getElementById('popupStok').style.display = 'none';
+}
+
+function simpanBarang() {
+  const barang = {
+    id: Date.now(),
+    nama: document.getElementById('namaBarang').value,
+    barcode: document.getElementById('barcodeBarang').value,
+    harga: parseInt(document.getElementById('hargaBarang').value) || 0,
+    stok: parseInt(document.getElementById('stokBarang').value) || 0,
+    kategori: 'Lainnya'
+  };
+  if(!barang.nama || !barang.barcode) return alert('Nama & Barcode wajib isi!');
+  daftarBarang.push(barang);
+  localStorage.setItem('db_barang', JSON.stringify(daftarBarang));
+  alert('Barang kesimpen! Refresh halaman buat muncul di kasir');
+  tutupStok();
+  location.reload();
+}
+
+function tampilkanBarang() {
+  let html = '';
+  daftarBarang.forEach((b, i) => {
+    html += `<div style="border:1px solid #ccc;padding:8px;margin:5px 0;display:flex;justify-content:space-between;align-items:center">
+      <div><b>${b.nama}</b><br>Rp${b.harga} | Stok:${b.stok} | ${b.barcode}</div>
+      <button onclick="hapusBarang(${i})" style="background:red;color:white;border:none;padding:4px 8px;">Hapus</button>
+    </div>`;
+  });
+  document.getElementById('listBarang').innerHTML = html || 'Belum ada barang';
+}
+
+function hapusBarang(index) {
+  if(confirm('Yakin hapus barang ini?')) {
+    daftarBarang.splice(index, 1);
+    localStorage.setItem('db_barang', JSON.stringify(daftarBarang));
+    tampilkanBarang();
+    location.reload();
+  }
+}
+// === AKHIR FITUR KELOLA STOK ===
 </script>
+   <!-- Tombol Kelola Stok -->
+<button onclick="bukaStok()" style="position:fixed;bottom:80px;right:20px;background:#1e3a8a;color:white;border:none;padding:12px 16px;border-radius:50%;font-size:24px;box-shadow:0 4px 8px rgba(0,0,0,0.3);z-index:999;">📦</button>
+
+<!-- Popup Stok -->
+<div id="popupStok" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:1000;overflow:auto;">
+  <div style="background:white;margin:20px;padding:20px;border-radius:12px;">
+    <h3>KELOLA STOK BARANG</h3>
+    <input id="namaBarang" placeholder="Nama Barang" style="width:100%;padding:10px;margin:6px 0;box-sizing:border-box;">
+    <input id="barcodeBarang" placeholder="Barcode - Klik sini lalu SCAN" style="width:100%;padding:10px;margin:6px 0;box-sizing:border-box;">
+    <input id="hargaBarang" type="number" placeholder="Harga Jual" style="width:100%;padding:10px;margin:6px 0;box-sizing:border-box;">
+    <input id="stokBarang" type="number" placeholder="Stok Awal" style="width:100%;padding:10px;margin:6px 0;box-sizing:border-box;">
+    <button onclick="simpanBarang()" style="background:#16a34a;color:white;width:100%;padding:12px;border:none;border-radius:8px;margin-top:10px;font-weight:bold;">SIMPAN BARANG</button>
+    <button onclick="tutupStok()" style="background:#dc2626;color:white;width:100%;padding:12px;border:none;border-radius:8px;margin-top:8px;">TUTUP</button>
+    <hr style="margin:15px 0;">
+    <h4>LIST BARANG:</h4>
+    <div id="listBarang"></div>
+  </div>
+       </div>
 </body>
    </html>
