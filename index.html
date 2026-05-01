@@ -20,7 +20,7 @@
   .kategori .active {background:#c0392b;color:white}
   .produk-grid {display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
   .card {background:white;border-radius:12px;padding:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);text-align:center}
-  .card img {width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;background:#eee}
+  .card img {width:100%;height:120px;object-fit:contain;border-radius:8px;margin-bottom:8px;background:#fff}
   .card h3 {font-size:13px;margin:4px 0;height:32px}
   .harga {color:#2980b9;font-weight:bold;font-size:16px;margin:6px 0}
   .btn-tambah {width:100%;padding:8px;background:#27ae60;color:white;border:none;border-radius:8px;font-weight:bold}
@@ -32,7 +32,7 @@
 <body>
 <div class="header">
   <h1>🚬 KASIR TOKO ANIS</h1>
-  <p>Selamat Datang Di Layanan Kasir Digital</p>
+  <p>Tap produk atau scan barcode</p>
   <div class="cart-count" id="cartCount">0</div>
 </div>
 
@@ -49,7 +49,6 @@
     <button onclick="filterKategori('Rokok Putih')">Putih</button>
     <button onclick="filterKategori('Minuman')">Minuman</button>
     <button onclick="filterKategori('Mie')">Mie</button>
-    <button onclick="filterKategori('Kopi')">Kopi</button>
   </div>
 
   <div class="produk-grid" id="produkList"></div>
@@ -62,39 +61,28 @@
 
 <script>
 const produk = [
-  // ROKOK MILD - GAMBAR VIA PLACEHOLDER DULU BIAR GAK RUSAK
-  {id:1,nama:"Sampoerna A Mild 16",harga:32000,kategori:"Rokok Mild",barcode:"8997213032165",img:"https://placehold.co/200x120/c0392b/ffffff?text=Sampoerna+Mild+16"},
-  {id:2,nama:"Sampoerna A Mild 12",harga:24000,kategori:"Rokok Mild",barcode:"8997213032127",img:"https://placehold.co/200x120/c0392b/ffffff?text=Sampoerna+Mild+12"},
-  {id:3,nama:"LA Bold 16",harga:28000,kategori:"Rokok Mild",barcode:"8992751001234",img:"https://placehold.co/200x120/2980b9/ffffff?text=LA+Bold+16"},
-  {id:4,nama:"Magnum Filter 12",harga:24000,kategori:"Rokok Mild",barcode:"8999909012345",img:"https://placehold.co/200x120/27ae60/ffffff?text=Magnum+12"},
-  {id:5,nama:"Gudang Garam Surya 16",harga:31000,kategori:"Rokok Mild",barcode:"8991001101234",img:"https://placehold.co/200x120/e67e22/ffffff?text=Surya+16"},
-  {id:6,nama:"Surya Pro 16",harga:33000,kategori:"Rokok Mild",barcode:"8991001101258",img:"https://placehold.co/200x120/e67e22/ffffff?text=Surya+Pro+16"},
+  // ROKOK MILD - FOTO ASLI WIKIMEDIA
+  {id:1,nama:"Sampoerna A Mild 16",harga:32000,kategori:"Rokok Mild",barcode:"8997213032165",img:"https://upload.wikimedia.org/wikipedia/id/thumb/3/3a/Sampoerna_A_Mild.jpg/200px-Sampoerna_A_Mild.jpg"},
+  {id:2,nama:"LA Bold 16",harga:28000,kategori:"Rokok Mild",barcode:"8992751001234",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Djarum_LA_Bold.jpg/200px-Djarum_LA_Bold.jpg"},
+  {id:3,nama:"Magnum Filter 12",harga:24000,kategori:"Rokok Mild",barcode:"8999909012345",img:"https://upload.wikimedia.org/wikipedia/id/thumb/c/c8/Magnum_Blue.jpg/200px-Magnum_Blue.jpg"},
+  {id:4,nama:"Gudang Garam Surya 16",harga:31000,kategori:"Rokok Mild",barcode:"8991001101234",img:"https://upload.wikimedia.org/wikipedia/id/thumb/8/8e/Gudang_Garam_Surya_16.jpg/200px-Gudang_Garam_Surya_16.jpg"},
   
-  // ROKOK KRETEK  
-  {id:7,nama:"Djarum Super 16",harga:29000,kategori:"Rokok Kretek",barcode:"8994901001234",img:"https://placehold.co/200x120/8e44ad/ffffff?text=Djarum+Super+16"},
-  {id:8,nama:"Djarum Super 12",harga:22000,kategori:"Rokok Kretek",barcode:"8994901001227",img:"https://placehold.co/200x120/8e44ad/ffffff?text=Djarum+Super+12"},
-  {id:9,nama:"Gudang Garam Merah 12",harga:18000,kategori:"Rokok Kretek",barcode:"8991001001234",img:"https://placehold.co/200x120/c0392b/ffffff?text=GG+Merah+12"},
-  {id:10,nama:"age pro",harga:10000,kategori:"Rokok Kretek",barcode:"8994456480009",img:"https://placehold.co/200x120/34495e/ffffff?text=Dji+Sam+Soe+12"},
+  // ROKOK KRETEK
+  {id:5,nama:"Djarum Super 16",harga:29000,kategori:"Rokok Kretek",barcode:"8994901001234",img:"https://upload.wikimedia.org/wikipedia/id/thumb/9/9d/Djarum_Super.jpg/200px-Djarum_Super.jpg"},
+  {id:6,nama:"Gudang Garam Merah 12",harga:18000,kategori:"Rokok Kretek",barcode:"8991001001234",img:"https://upload.wikimedia.org/wikipedia/id/thumb/f/f8/Gudang_Garam_Merah.jpg/200px-Gudang_Garam_Merah.jpg"},
+  {id:7,nama:"Dji Sam Soe 234",harga:19000,kategori:"Rokok Kretek",barcode:"8994902001234",img:"https://upload.wikimedia.org/wikipedia/id/thumb/5/5c/Dji_Sam_Soe_234.jpg/200px-Dji_Sam_Soe_234.jpg"},
   
   // ROKOK PUTIH
-  {id:11,nama:"Marlboro Merah 20",harga:38000,kategori:"Rokok Putih",barcode:"8991234001234",img:"https://placehold.co/200x120/e74c3c/ffffff?text=Marlboro+20"},
-  {id:12,nama:"Dunhill Merah 20",harga:40000,kategori:"Rokok Putih",barcode:"8992345001234",img:"https://placehold.co/200x120/c0392b/ffffff?text=Dunhill+20"},
+  {id:8,nama:"Marlboro Merah 20",harga:38000,kategori:"Rokok Putih",barcode:"8991234001234",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Marlboro_cigarette_pack.jpg/200px-Marlboro_cigarette_pack.jpg"},
+  {id:9,nama:"Dunhill Merah 20",harga:40000,kategori:"Rokok Putih",barcode:"8992345001234",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Dunhill_cigarettes.jpg/200px-Dunhill_cigarettes.jpg"},
   
   // MINUMAN
-  {id:13,nama:"Aqua 600ml",harga:4000,kategori:"Minuman",barcode:"8992761111017",img:"https://placehold.co/200x120/3498db/ffffff?text=Aqua+600ml"},
-  {id:14,nama:"Aqua 1500ml",harga:7000,kategori:"Minuman",barcode:"8992761111031",img:"https://placehold.co/200x120/3498db/ffffff?text=Aqua+1500ml"},
-  {id:15,nama:"Le Minerale 600ml",harga:3500,kategori:"Minuman",barcode:"8993001123016",img:"https://placehold.co/200x120/1abc9c/ffffff?text=Le+Minerale"},
-  {id:16,nama:"Teh Pucuk 350ml",harga:3500,kategori:"Minuman",barcode:"8996001601234",img:"https://placehold.co/200x120/2ecc71/ffffff?text=Teh+Pucuk"},
+  {id:10,nama:"Aqua 600ml",harga:4000,kategori:"Minuman",barcode:"8992761111017",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Aqua_Danone.jpg/200px-Aqua_Danone.jpg"},
+  {id:11,nama:"Le Minerale 600ml",harga:3500,kategori:"Minuman",barcode:"8993001123016",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Le_Minerale.jpg/200px-Le_Minerale.jpg"},
   
   // MIE
-  {id:17,nama:"Mie Sedaap Goreng",harga:3500,kategori:"Mie",barcode:"8998866201234",img:"https://placehold.co/200x120/f39c12/ffffff?text=Sedaap+Goreng"},
-  {id:18,nama:"Mie Sedaap Soto",harga:3500,kategori:"Mie",barcode:"8998866202234",img:"https://placehold.co/200x120/f39c12/ffffff?text=Sedaap+Soto"},
-  {id:19,nama:"Indomie Goreng",harga:3500,kategori:"Mie",barcode:"0896860101234",img:"https://placehold.co/200x120/e74c3c/ffffff?text=Indomie+Goreng"},
-  
-  // KOPI
-  {id:20,nama:"Good Day Cappuccino",harga:2000,kategori:"Kopi",barcode:"8998009012345",img:"https://placehold.co/200x120/795548/ffffff?text=Good+Day+Capp"},
-  {id:21,nama:"Good Day Mocacinno",harga:2000,kategori:"Kopi",barcode:"8998009012352",img:"https://placehold.co/200x120/795548/ffffff?text=Good+Day+Moca"},
-  {id:22,nama:"Kopi Kapal Api 65gr",harga:3500,kategori:"Kopi",barcode:"8991001105234",img:"https://placehold.co/200x120/6d4c41/ffffff?text=Kapal+Api"},
+  {id:12,nama:"Mie Sedaap Goreng",harga:3500,kategori:"Mie",barcode:"8998866201234",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Mie_Sedaap_Goreng.jpg/200px-Mie_Sedaap_Goreng.jpg"},
+  {id:13,nama:"Indomie Goreng",harga:3500,kategori:"Mie",barcode:"0896860101234",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Indomie_Mi_goreng.png/200px-Indomie_Mi_goreng.png"},
 ];
 
 let keranjang = [];
@@ -105,7 +93,7 @@ function renderProduk(filter = 'Semua') {
   const data = filter === 'Semua' ? produk : produk.filter(p => p.kategori === filter);
   list.innerHTML = data.map(p => `
     <div class="card">
-      <img src="${p.img}" alt="${p.nama}">
+      <img src="${p.img}" alt="${p.nama}" onerror="this.src='https://placehold.co/200x120/c0392b/ffffff?text=${p.nama.replace(/ /g,'+')}'">
       <h3>${p.nama}</h3>
       <div class="harga">Rp${p.harga.toLocaleString('id-ID')}</div>
       <button class="btn-tambah" onclick="tambahKeranjang(${p.id})">+ Tambah</button>
@@ -169,4 +157,4 @@ document.getElementById('inputManual').onkeyup = (e) => {
 renderProduk();
 </script>
 </body>
-</html>
+   </html>
