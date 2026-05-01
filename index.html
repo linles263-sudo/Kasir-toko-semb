@@ -20,35 +20,19 @@
         .scan-btn { background: white; color: #4CAF50; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         #reader { width: 100%; margin-top: 10px; border-radius: 8px; display: none; }
         
-        /* REVISI BAGIAN INI PROF */
-        .produk-header { 
-            padding: 0 15px; 
-            margin-top: 15px; 
-            text-align: center; 
+        .scan-cepat { padding: 0 15px; margin-top: 10px; }
+        .scan-cepat input { 
+            width: 100%; padding: 12px; border: 2px solid #4CAF50; border-radius: 8px; 
+            text-align: center; font-size: 16px; font-weight: bold;
         }
-        .produk-header h3 { 
-            font-size: 18px; 
-            margin-bottom: 10px; 
-        }
-        .tombol-aksi { 
-            display: flex; 
-            justify-content: center; 
-            gap: 8px; 
-        }
-        .btn-header { 
-            color: white; 
-            border: none; 
-            padding: 8px 12px; 
-            border-radius: 20px; 
-            font-weight: bold; 
-            font-size: 13px; 
-            flex: 1;
-            max-width: 110px;
-        }
+        
+        .produk-header { padding: 0 15px; margin-top: 15px; text-align: center; }
+        .produk-header h3 { font-size: 18px; margin-bottom: 10px; }
+        .tombol-aksi { display: flex; justify-content: center; gap: 8px; }
+        .btn-header { color: white; border: none; padding: 8px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; flex: 1; max-width: 110px; }
         .btn-laporan { background: #2196F3; }
         .btn-hapus-data { background: #d32f2f; }
         .btn-setting { background: #FF9800; }
-        /* AKHIR REVISI */
         
         .kategori { display: flex; overflow-x: auto; padding: 10px 15px; gap: 10px; }
         .kategori-btn { background: #e0e0e0; border: none; padding: 8px 15px; border-radius: 20px; white-space: nowrap; }
@@ -99,7 +83,11 @@
         </div>
     </div>
 
-    <!-- REVISI HTML BAGIAN INI PROF -->
+    <div class="scan-cepat">
+        <input type="text" id="inputScanCepat" placeholder="Klik sini lalu tembak barcode..." 
+               onkeypress="if(event.key==='Enter') scanCepat()">
+    </div>
+
     <div class="produk-header">
         <h3>Daftar Produk</h3>
         <div class="tombol-aksi">
@@ -108,7 +96,6 @@
             <button class="btn-header btn-laporan" onclick="bukaLaporan()">📊 LAPORAN</button>
         </div>
     </div>
-    <!-- AKHIR REVISI -->
 
     <div class="kategori" id="listKategori">
         <button class="kategori-btn aktif" onclick="filterKategori('Semua', this)">Semua</button>
@@ -213,7 +200,22 @@ let kategoriAktif = 'Semua';
 let namaKasir = localStorage.getItem('namaKasir') || '';
 let namaToko = localStorage.getItem('namaToko') || 'TOKO PUNTEN';
 let html5QrCode;
-const beepSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'.replace('...','uT19q'));
+
+// BEEP SOUND FIX - pake AudioContext biar ga bug
+function playBeep() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.type = 'square';
+        oscillator.frequency.value = 800;
+        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
+    } catch(e) { console.log('Beep error:', e); }
+}
 
 document.getElementById('namaToko').innerText = namaToko;
 
@@ -223,6 +225,17 @@ if (namaKasir) {
     renderProduk();
 } else {
     document.getElementById('modalLogin').style.display = 'block';
+}
+
+// FITUR SCAN CEPET BUAT SCANNER TEMBAK
+function scanCepat() {
+    const barcode = document.getElementById('inputScanCepat').value.trim();
+    document.getElementById('inputScanCepat').value = '';
+    if (!barcode) return;
+    playBeep();
+    const item = produk.find(p => p.barcode == barcode);
+    if(item) tambahKeranjang(item.id);
+    else alert('Barang tidak ditemukan! Tambah dulu via tombol +');
 }
 
 function bukaSetting() {
@@ -331,7 +344,7 @@ function onScanSuccess(decodedText) {
     html5QrCode.stop();
     document.getElementById('reader').style.display = 'none';
     document.getElementById('statusScan').innerText = 'Siap scan...';
-    beepSound.play().catch(e=>{});
+    playBeep();
     const item = produk.find(p => p.barcode == decodedText);
     if(item) tambahKeranjang(item.id);
     else alert('Barang tidak ditemukan! Tambah dulu via tombol +');
