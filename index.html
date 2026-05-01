@@ -20,7 +20,7 @@
   .kategori .active {background:#c0392b;color:white}
   .produk-grid {display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
   .card {background:white;border-radius:12px;padding:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);text-align:center}
-  .card img {width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px}
+  .card img {width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;background:#eee}
   .card h3 {font-size:13px;margin:4px 0;height:32px}
   .harga {color:#2980b9;font-weight:bold;font-size:16px;margin:6px 0}
   .btn-tambah {width:100%;padding:8px;background:#27ae60;color:white;border:none;border-radius:8px;font-weight:bold}
@@ -32,7 +32,7 @@
 <body>
 <div class="header">
   <h1>🚬 KASIR TOKO ANIS</h1>
-  <p>Tap produk atau scan barcode</p>
+  <p>Selamat Datang Di Layanan Kasir Digital</p>
   <div class="cart-count" id="cartCount">0</div>
 </div>
 
@@ -62,43 +62,39 @@
 
 <script>
 const produk = [
-  // ROKOK MILD
-  {id:1,nama:"Sampoerna A Mild 16",harga:32000,kategori:"Rokok Mild",barcode:"8997213032165",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2023/8/2/6c3a8f8e-8f8e-4e8e-8f8e-6c3a8f8e8f8e.jpg"},
-  {id:2,nama:"Sampoerna A Mild 12",harga:24000,kategori:"Rokok Mild",barcode:"8997213032127",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/1/1/1a1a1a1a-1a1a-1a1a-1a1a-1a1a1a1a.jpg"},
-  {id:3,nama:"LA Bold 16",harga:28000,kategori:"Rokok Mild",barcode:"8992751001234",img:"https://down-id.img.susercontent.com/file/id-11134207-7qul9-lj8h8h8h8h"},
-  {id:4,nama:"Magnum Filter 12",harga:24000,kategori:"Rokok Mild",barcode:"8999909012345",img:"https://down-id.img.susercontent.com/file/id-11134207-7r98o-lm8h8h8h8h"},
-  {id:5,nama:"Gudang Garam Surya 16",harga:31000,kategori:"Rokok Mild",barcode:"8991001101234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2023/1/10/7b7b-7b7b-7b7b-7b7b-7b7b7b7b.jpg"},
-  {id:6,nama:"Gudang Garam Surya Pro 16",harga:33000,kategori:"Rokok Mild",barcode:"8991001101258",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2023/4/5/4d4d4d4d-4d4d-4d4d-4d4d-4d4d4d4d.jpg"},
-  {id:7,nama:"LA Lights 16",harga:28000,kategori:"Rokok Mild",barcode:"8992751002234",img:"https://images.tokopedia.net/img/cache/700/product-1/2020/8/8/12345678/12345678_12345678.jpg"},
+  // ROKOK MILD - GAMBAR VIA PLACEHOLDER DULU BIAR GAK RUSAK
+  {id:1,nama:"Sampoerna A Mild 16",harga:32000,kategori:"Rokok Mild",barcode:"8997213032165",img:"https://placehold.co/200x120/c0392b/ffffff?text=Sampoerna+Mild+16"},
+  {id:2,nama:"Sampoerna A Mild 12",harga:24000,kategori:"Rokok Mild",barcode:"8997213032127",img:"https://placehold.co/200x120/c0392b/ffffff?text=Sampoerna+Mild+12"},
+  {id:3,nama:"LA Bold 16",harga:28000,kategori:"Rokok Mild",barcode:"8992751001234",img:"https://placehold.co/200x120/2980b9/ffffff?text=LA+Bold+16"},
+  {id:4,nama:"Magnum Filter 12",harga:24000,kategori:"Rokok Mild",barcode:"8999909012345",img:"https://placehold.co/200x120/27ae60/ffffff?text=Magnum+12"},
+  {id:5,nama:"Gudang Garam Surya 16",harga:31000,kategori:"Rokok Mild",barcode:"8991001101234",img:"https://placehold.co/200x120/e67e22/ffffff?text=Surya+16"},
+  {id:6,nama:"Surya Pro 16",harga:33000,kategori:"Rokok Mild",barcode:"8991001101258",img:"https://placehold.co/200x120/e67e22/ffffff?text=Surya+Pro+16"},
   
   // ROKOK KRETEK  
-  {id:8,nama:"Djarum Super 16",harga:29000,kategori:"Rokok Kretek",barcode:"8994901001234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2023/2/15/8c8c-8c8c-8c8c-8c8c-8c8c.jpg"},
-  {id:9,nama:"Djarum Super 12",harga:22000,kategori:"Rokok Kretek",barcode:"8994901001227",img:"https://images.tokopedia.net/img/cache/700/product-1/2021/3/3/9876543/9876543_9876543.jpg"},
-  {id:10,nama:"Gudang Garam Merah 12",harga:18000,kategori:"Rokok Kretek",barcode:"8991001001234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/12/1/9d9d9d9d-9d9d-9d9d-9d9d-9d9d9d9d.jpg"},
-  {id:11,nama:"Dji Sam Soe 234 12",harga:19000,kategori:"Rokok Kretek",barcode:"8994902001234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2023/3/20/1e1e-1e1e-1e1e-1e1e-1e1e.jpg"},
-  {id:12,nama:"age pro",harga:10000,kategori:"Rokok Kretek",barcode:"8994456480009",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/9/1/2f2f2f2f-2f2f-2f2f-2f2f-2f2f2f2f.jpg"},
+  {id:7,nama:"Djarum Super 16",harga:29000,kategori:"Rokok Kretek",barcode:"8994901001234",img:"https://placehold.co/200x120/8e44ad/ffffff?text=Djarum+Super+16"},
+  {id:8,nama:"Djarum Super 12",harga:22000,kategori:"Rokok Kretek",barcode:"8994901001227",img:"https://placehold.co/200x120/8e44ad/ffffff?text=Djarum+Super+12"},
+  {id:9,nama:"Gudang Garam Merah 12",harga:18000,kategori:"Rokok Kretek",barcode:"8991001001234",img:"https://placehold.co/200x120/c0392b/ffffff?text=GG+Merah+12"},
+  {id:10,nama:"age pro",harga:10000,kategori:"Rokok Kretek",barcode:"8994456480009",img:"https://placehold.co/200x120/34495e/ffffff?text=Dji+Sam+Soe+12"},
   
   // ROKOK PUTIH
-  {id:13,nama:"Marlboro Merah 20",harga:38000,kategori:"Rokok Putih",barcode:"8991234001234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2023/5/10/3a3a3a3a-3a3a-3a3a-3a3a-3a3a3a3a.jpg"},
-  {id:14,nama:"Dunhill Merah 20",harga:40000,kategori:"Rokok Putih",barcode:"8992345001234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2023/7/20/5c5c-5c5c-5c5c-5c5c-5c5c.jpg"},
-  {id:15,nama:"Marlboro Filter Black 20",harga:39000,kategori:"Rokok Putih",barcode:"8991234002234",img:"https://images.tokopedia.net/img/cache/700/product-1/2022/6/6/5555555/5555555_5555555.jpg"},
+  {id:11,nama:"Marlboro Merah 20",harga:38000,kategori:"Rokok Putih",barcode:"8991234001234",img:"https://placehold.co/200x120/e74c3c/ffffff?text=Marlboro+20"},
+  {id:12,nama:"Dunhill Merah 20",harga:40000,kategori:"Rokok Putih",barcode:"8992345001234",img:"https://placehold.co/200x120/c0392b/ffffff?text=Dunhill+20"},
   
   // MINUMAN
-  {id:16,nama:"Aqua 600ml",harga:4000,kategori:"Minuman",barcode:"8992761111017",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/7/7/1111111/1111111_1111111.jpg"},
-  {id:17,nama:"Aqua 1500ml",harga:7000,kategori:"Minuman",barcode:"8992761111031",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/7/7/2222222/2222222_2222222.jpg"},
-  {id:18,nama:"Le Minerale 600ml",harga:3500,kategori:"Minuman",barcode:"8993001123016",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2023/1/1/3333333/3333333_3333333.jpg"},
-  {id:19,nama:"Le Minerale 1500ml",harga:6500,kategori:"Minuman",barcode:"8993001123023",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2023/1/1/4444444/4444444_4444444.jpg"},
-  {id:20,nama:"Teh Pucuk 350ml",harga:3500,kategori:"Minuman",barcode:"8996001601234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/2/2/6666666/6666666_6666666.jpg"},
+  {id:13,nama:"Aqua 600ml",harga:4000,kategori:"Minuman",barcode:"8992761111017",img:"https://placehold.co/200x120/3498db/ffffff?text=Aqua+600ml"},
+  {id:14,nama:"Aqua 1500ml",harga:7000,kategori:"Minuman",barcode:"8992761111031",img:"https://placehold.co/200x120/3498db/ffffff?text=Aqua+1500ml"},
+  {id:15,nama:"Le Minerale 600ml",harga:3500,kategori:"Minuman",barcode:"8993001123016",img:"https://placehold.co/200x120/1abc9c/ffffff?text=Le+Minerale"},
+  {id:16,nama:"Teh Pucuk 350ml",harga:3500,kategori:"Minuman",barcode:"8996001601234",img:"https://placehold.co/200x120/2ecc71/ffffff?text=Teh+Pucuk"},
   
   // MIE
-  {id:21,nama:"Mie Sedaap Goreng",harga:3500,kategori:"Mie",barcode:"8998866201234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/3/3/7777777/7777777_7777777.jpg"},
-  {id:22,nama:"Mie Sedaap Soto",harga:3500,kategori:"Mie",barcode:"8998866202234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/3/3/8888888/8888888_8888888.jpg"},
-  {id:23,nama:"Indomie Goreng",harga:3500,kategori:"Mie",barcode:"0896860101234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/4/4/9999999/9999999_9999999.jpg"},
+  {id:17,nama:"Mie Sedaap Goreng",harga:3500,kategori:"Mie",barcode:"8998866201234",img:"https://placehold.co/200x120/f39c12/ffffff?text=Sedaap+Goreng"},
+  {id:18,nama:"Mie Sedaap Soto",harga:3500,kategori:"Mie",barcode:"8998866202234",img:"https://placehold.co/200x120/f39c12/ffffff?text=Sedaap+Soto"},
+  {id:19,nama:"Indomie Goreng",harga:3500,kategori:"Mie",barcode:"0896860101234",img:"https://placehold.co/200x120/e74c3c/ffffff?text=Indomie+Goreng"},
   
   // KOPI
-  {id:24,nama:"Good Day Cappuccino",harga:2000,kategori:"Kopi",barcode:"8998009012345",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/5/5/1010101/1010101_1010101.jpg"},
-  {id:25,nama:"Good Day Mocacinno",harga:2000,kategori:"Kopi",barcode:"8998009012352",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/5/5/1212121/1212121_1212121.jpg"},
-  {id:26,nama:"Kopi Kapal Api 65gr",harga:3500,kategori:"Kopi",barcode:"8991001105234",img:"https://images.tokopedia.net/img/cache/700/VqbcmM/2022/6/6/1313131/1313131_1313131.jpg"},
+  {id:20,nama:"Good Day Cappuccino",harga:2000,kategori:"Kopi",barcode:"8998009012345",img:"https://placehold.co/200x120/795548/ffffff?text=Good+Day+Capp"},
+  {id:21,nama:"Good Day Mocacinno",harga:2000,kategori:"Kopi",barcode:"8998009012352",img:"https://placehold.co/200x120/795548/ffffff?text=Good+Day+Moca"},
+  {id:22,nama:"Kopi Kapal Api 65gr",harga:3500,kategori:"Kopi",barcode:"8991001105234",img:"https://placehold.co/200x120/6d4c41/ffffff?text=Kapal+Api"},
 ];
 
 let keranjang = [];
@@ -109,7 +105,7 @@ function renderProduk(filter = 'Semua') {
   const data = filter === 'Semua' ? produk : produk.filter(p => p.kategori === filter);
   list.innerHTML = data.map(p => `
     <div class="card">
-      <img src="${p.img}" alt="${p.nama}" onerror="this.src='https://via.placeholder.com/200x120/c0392b/ffffff?text=${p.nama.replace(/ /g,'+')}'">
+      <img src="${p.img}" alt="${p.nama}">
       <h3>${p.nama}</h3>
       <div class="harga">Rp${p.harga.toLocaleString('id-ID')}</div>
       <button class="btn-tambah" onclick="tambahKeranjang(${p.id})">+ Tambah</button>
@@ -143,7 +139,6 @@ function bayarWA() {
   keranjang.forEach(i => { pesan += `${i.nama} x${i.qty} = Rp${(i.harga*i.qty).toLocaleString('id-ID')}%0A` });
   const total = keranjang.reduce((sum,i) => sum + i.harga*i.qty, 0);
   pesan += `%0A*Total: Rp${total.toLocaleString('id-ID')}*`;
-  // 62895351432524
   window.open(`https://wa.me/62895351432524?text=${pesan}`,'_blank');
 }
 
@@ -174,4 +169,4 @@ document.getElementById('inputManual').onkeyup = (e) => {
 renderProduk();
 </script>
 </body>
-        </html>
+</html>
