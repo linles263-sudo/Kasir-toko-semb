@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>KASIR TOKO ANIS - ALFAMART MODE</title>
+<title>KASIR TOKO ANIS - ALFAMART MODE FINAL</title>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
     * {margin:0;padding:0;box-sizing:border-box;font-family:'Inter','Segoe UI',sans-serif;-webkit-tap-highlight-color:transparent}
-  body {background:#f5f5f5;color:#1a1a1a;padding-bottom:240px}
+  body {background:#f5f5f5;color:#1a1a1a;padding-bottom:260px}
   .header {background:#DC2626;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;color:white}
   .header-left p {font-size:12px;opacity:0.9;margin-bottom:4px;letter-spacing:1px}
   .header-left h1 {font-size:24px;font-weight:800;display:flex;align-items:center;gap:8px}
@@ -15,17 +15,17 @@
   .cart-count {position:absolute;top:-4px;right:-4px;background:#FBBF24;color:#DC2626;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold}
   .container {padding:16px;max-width:600px;margin:auto}
   .scan-box {background:#16a34a;border-radius:16px;padding:20px;margin-bottom:12px;color:white}
-  .scan-box h2 {font-size:18px;margin-bottom:8px;font-weight:700}
-  .scan-status {font-size:14px;opacity:0.9;margin-bottom:12px;min-height:20px;text-align:center}
-  .scan-input {width:100%;padding:14px;border:2px solid white;border-radius:12px;font-size:16px;background:white;color:#1a1a1a;text-align:center;font-weight:700}
-  .scan-input:focus {outline:none;box-shadow:0 0 0 3px rgba(255,255,255,0.3)}
-  .last-scan {background:#15803d;border-radius:12px;padding:12px;margin:12px 0;text-align:center;display:none;animation:fadeIn 0.3s}
-  @keyframes fadeIn {from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)}}
-  .last-scan h3 {font-size:14px;opacity:0.9;margin-bottom:4px}
-  .last-scan p {font-size:20px;font-weight:800}
-  #reader {width:100%;border-radius:12px;overflow:hidden;margin:12px 0;display:none;border:3px solid white}
+  .scan-box h2 {font-size:18px;margin-bottom:8px;font-weight:700;text-align:center}
+  .scan-status {font-size:14px;opacity:0.9;margin-bottom:12px;min-height:20px;text-align:center;font-weight:600}
+  .scan-input {width:100%;padding:14px;border:2px solid white;border-radius:12px;font-size:16px;background:rgba(255,255,255,0.2);color:white;text-align:center;font-weight:700;pointer-events:none}
+  .scan-input::placeholder {color:rgba(255,255,255,0.7)}
+  .last-scan {background:#15803d;border-radius:12px;padding:16px;margin:12px 0;text-align:center;display:none;animation:pop 0.3s}
+  @keyframes pop {0%{transform:scale(0.8);opacity:0} 100%{transform:scale(1);opacity:1}}
+  .last-scan h3 {font-size:14px;opacity:0.9;margin-bottom:6px}
+  .last-scan p {font-size:22px;font-weight:800}
+  #reader {width:100%;border-radius:12px;overflow:hidden;margin:12px 0;display:none;border:4px solid white}
   .scan-btn-group {display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-  .scan-btn {padding:16px;border:none;border-radius:12px;font-size:16px;font-weight:800;background:white;color:#16a34a}
+  .scan-btn {padding:18px;border:none;border-radius:12px;font-size:16px;font-weight:800;background:white;color:#16a34a}
   .scan-btn:active {transform:scale(0.95)}
   .scan-btn.dark {background:#15803d;color:white}
   .section-title {font-size:20px;font-weight:800;margin:20px 0 12px}
@@ -40,21 +40,21 @@
   .btn-tambah {padding:10px 20px;background:#1a1a1a;color:white;border:none;border-radius:10px;font-weight:800;font-size:14px}
   .btn-tambah:active {transform:scale(0.9)}
   .payment-fixed {position:fixed;bottom:0;left:0;right:0;background:white;padding:16px;box-shadow:0 -4px 12px rgba(0,0,0,0.1);max-width:600px;margin:auto;border-top:3px solid #DC2626}
-  .total-row {display:flex;justify-content:space-between;font-size:22px;font-weight:800;margin-bottom:12px}
-  .btn-total {width:100%;padding:18px;background:#DC2626;color:white;border:none;border-radius:12px;font-size:18px;font-weight:800;margin-bottom:8px}
+  .total-row {display:flex;justify-content:space-between;font-size:24px;font-weight:800;margin-bottom:12px}
+  .btn-total {width:100%;padding:20px;background:#DC2626;color:white;border:none;border-radius:12px;font-size:18px;font-weight:800;margin-bottom:8px}
   .btn-total:active {transform:scale(0.98)}
   .btn-total:disabled {background:#9CA3AF}
   .payment-options {display:none;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0}
-  .btn-pay {padding:16px;border:none;border-radius:12px;font-size:15px;font-weight:800}
+  .btn-pay {padding:18px;border:none;border-radius:12px;font-size:16px;font-weight:800}
   .btn-pay:active {transform:scale(0.95)}
   .btn-cash {background:#16a34a;color:white}
   .btn-qris {background:#3B82F6;color:white}
   .btn-debit {background:#F59E0B;color:white}
   .cash-input {display:none;margin:12px 0}
-  .cash-input input {width:100%;padding:16px;border:3px solid #DC2626;border-radius:12px;font-size:20px;text-align:center;font-weight:800}
-  .kembalian {display:none;background:#FEF3C7;padding:16px;border-radius:12px;text-align:center;margin:8px 0;border:2px dashed #F59E0B}
+  .cash-input input {width:100%;padding:18px;border:3px solid #DC2626;border-radius:12px;font-size:22px;text-align:center;font-weight:800}
+  .kembalian {display:none;background:#FEF3C7;padding:18px;border-radius:12px;text-align:center;margin:8px 0;border:3px dashed #F59E0B}
   .kembalian h3 {color:#92400E;font-size:16px;margin-bottom:4px;font-weight:700}
-  .kembalian p {color:#DC2626;font-size:28px;font-weight:800}
+  .kembalian p {color:#DC2626;font-size:32px;font-weight:800}
   .struk {display:none;background:white;padding:20px;border:1px dashed #ccc;margin:16px;font-family:monospace;font-size:12px}
   .struk h2 {text-align:center;margin-bottom:8px}
   .struk-center {text-align:center}
@@ -72,12 +72,12 @@
   <div class="scan-box">
     <h2>SCAN BARANG</h2>
     <div class="scan-status" id="scanStatus">Siap scan...</div>
-    <input type="text" class="scan-input" id="inputManual" placeholder="ARAHKAN SCANNER KE SINI" autofocus inputmode="numeric">
+    <input type="text" class="scan-input" id="inputManual" placeholder="GUNAKAN TOMBOL KAMERA" readonly>
     <div class="last-scan" id="lastScan"><h3>TERAKHIR SCAN:</h3><p id="lastScanText"></p></div>
     <div id="reader"></div>
     <div class="scan-btn-group">
       <button class="scan-btn" onclick="resetKeranjang()">🔄 RESET</button>
-      <button class="scan-btn dark" id="btnKamera">📷 KAMERA</button>
+      <button class="scan-btn dark" id="btnKamera">📷 SCAN KAMERA</button>
     </div>
   </div>
 
@@ -197,7 +197,6 @@ function tambahKeranjang(id) {
   updateKeranjang();
   document.getElementById('lastScan').style.display = 'block';
   document.getElementById('lastScanText').textContent = `${p.nama} - Rp${p.harga.toLocaleString('id-ID')}`;
-  document.getElementById('inputManual').focus();
 }
 
 function updateKeranjang() {
@@ -218,7 +217,6 @@ function resetKeranjang() {
     document.getElementById('btnTotal').textContent = '💰 PILIH METODE BAYAR';
     document.getElementById('btnTotal').disabled = false;
     document.getElementById('uangCash').value = '';
-    document.getElementById('inputManual').focus();
   }
 }
 
@@ -284,21 +282,7 @@ function generateStruk(metode) {
   document.getElementById('strukTanggal').textContent = new Date().toLocaleString('id-ID');
 }
 
-// INPUT MANUAL BARCODE SCANNER
-document.getElementById('inputManual').addEventListener('input', function(e) {
-  let barcode = e.target.value.replace(/\s/g, '');
-  if(barcode.length >= 8) {
-    const p = produk.find(p=>p.barcode===barcode);
-    if(p) { 
-      tambahKeranjang(p.id); 
-      e.target.value = ''; 
-    } else if(barcode.length >= 13) { 
-      e.target.value = ''; 
-    }
-  }
-});
-
-// KAMERA 1X SCAN LANGSUNG MATI - VERSI ALFAMART
+// KAMERA 1X SCAN LANGSUNG MATI - FIX FINAL
 document.getElementById('btnKamera').onclick = async () => {
   const reader = document.getElementById('reader');
   
@@ -313,16 +297,23 @@ document.getElementById('btnKamera').onclick = async () => {
       await html5QrCode.start(
         { facingMode: "environment" },
         { fps: 10, qrbox: { width: 250, height: 250 } },
-        (barcode) => {
+        (decodedText) => {
+          // LANGSUNG STOP KALO DAPET BARCODE
           if(isScanning) {
             isScanning = false;
-            const p = produk.find(p=>p.barcode===barcode);
-            if(p) tambahKeranjang(p.id);
+            const p = produk.find(p=>p.barcode===decodedText);
+            if(p) {
+              tambahKeranjang(p.id);
+              document.getElementById('scanStatus').textContent = 'TIT! Scan berhasil';
+            } else {
+              document.getElementById('scanStatus').textContent = 'Barcode tidak ditemukan';
+            }
             
             html5QrCode.stop().then(() => {
               reader.style.display = 'none';
-              document.getElementById('scanStatus').textContent = 'Siap scan...';
-              document.getElementById('inputManual').focus();
+              setTimeout(() => {
+                document.getElementById('scanStatus').textContent = 'Siap scan...';
+              }, 1500);
             }).catch(()=>{});
           }
         },
@@ -331,27 +322,26 @@ document.getElementById('btnKamera').onclick = async () => {
     } catch(err) {
       isScanning = false;
       reader.style.display = 'none';
-      alert('Gagal buka kamera. Pastikan izinkan akses kamera.');
+      document.getElementById('scanStatus').textContent = 'Kamera error. Coba lagi.';
+      setTimeout(() => {
+        document.getElementById('scanStatus').textContent = 'Siap scan...';
+      }, 2000);
     }
   } else {
     isScanning = false;
     html5QrCode.stop().then(() => {
       reader.style.display = 'none';
       document.getElementById('scanStatus').textContent = 'Siap scan...';
-      document.getElementById('inputManual').focus();
     }).catch(()=>{});
   }
 };
 
-document.addEventListener('click', () => { if(!isScanning) document.getElementById('inputManual').focus() });
 window.addEventListener('load', () => { 
-  document.getElementById('inputManual').focus(); 
   renderProduk(); 
   document.getElementById('cashInput').style.display = 'none';
   document.getElementById('kembalianBox').style.display = 'none';
   document.getElementById('paymentOptions').style.display = 'none';
 });
-setInterval(() => {if(!isScanning) document.getElementById('inputManual').focus()}, 3000);
 
 function filterKategori(kat) {
   document.querySelectorAll('.kategori button').forEach(b => b.classList.remove('active'));
@@ -360,4 +350,4 @@ function filterKategori(kat) {
 }
 </script>
 </body>
-       </html>
+                      </html>
