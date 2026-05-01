@@ -19,12 +19,37 @@
         .scan-buttons { display: flex; justify-content: space-around; margin-top: 10px; }
         .scan-btn { background: white; color: #4CAF50; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; }
         #reader { width: 100%; margin-top: 10px; border-radius: 8px; display: none; }
-        .produk-header { display: flex; justify-content: space-between; align-items: center; padding: 0 15px; margin-top: 15px; gap: 6px; flex-wrap: wrap; }
-        .produk-header h3 { font-size: 18px; }
-        .btn-header { color: white; border: none; padding: 8px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
+        
+        /* REVISI BAGIAN INI PROF */
+        .produk-header { 
+            padding: 0 15px; 
+            margin-top: 15px; 
+            text-align: center; 
+        }
+        .produk-header h3 { 
+            font-size: 18px; 
+            margin-bottom: 10px; 
+        }
+        .tombol-aksi { 
+            display: flex; 
+            justify-content: center; 
+            gap: 8px; 
+        }
+        .btn-header { 
+            color: white; 
+            border: none; 
+            padding: 8px 12px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            font-size: 13px; 
+            flex: 1;
+            max-width: 110px;
+        }
         .btn-laporan { background: #2196F3; }
         .btn-hapus-data { background: #d32f2f; }
         .btn-setting { background: #FF9800; }
+        /* AKHIR REVISI */
+        
         .kategori { display: flex; overflow-x: auto; padding: 10px 15px; gap: 10px; }
         .kategori-btn { background: #e0e0e0; border: none; padding: 8px 15px; border-radius: 20px; white-space: nowrap; }
         .kategori-btn.aktif { background: #333; color: white; }
@@ -55,7 +80,7 @@
     <div class="header">
         <div class="title">
             <h1>KASIR DIGITAL PRO</h1>
-            <h2 id="namaToko">TOKO ANIS</h2>
+            <h2 id="namaToko">TOKO PUNTEN</h2>
         </div>
         <div class="kasir-info">
             Kasir: <span id="namaKasir">-</span>
@@ -74,12 +99,16 @@
         </div>
     </div>
 
+    <!-- REVISI HTML BAGIAN INI PROF -->
     <div class="produk-header">
         <h3>Daftar Produk</h3>
-        <button class="btn-header btn-setting" onclick="bukaSetting()">⚙️ PENGATURAN</button>
-        <button class="btn-header btn-hapus-data" onclick="hapusSemuaProduk()">🗑️ HAPUS SEMUA</button>
-        <button class="btn-header btn-laporan" onclick="bukaLaporan()">📊 LAPORAN</button>
+        <div class="tombol-aksi">
+            <button class="btn-header btn-setting" onclick="bukaSetting()">⚙️ PENGATURAN</button>
+            <button class="btn-header btn-hapus-data" onclick="hapusSemuaProduk()">🗑️ HAPUS</button>
+            <button class="btn-header btn-laporan" onclick="bukaLaporan()">📊 LAPORAN</button>
+        </div>
     </div>
+    <!-- AKHIR REVISI -->
 
     <div class="kategori" id="listKategori">
         <button class="kategori-btn aktif" onclick="filterKategori('Semua', this)">Semua</button>
@@ -182,7 +211,7 @@ let keranjang = [];
 let laporan = JSON.parse(localStorage.getItem('laporanJual')) || [];
 let kategoriAktif = 'Semua';
 let namaKasir = localStorage.getItem('namaKasir') || '';
-let namaToko = localStorage.getItem('namaToko') || 'TOKO ANIS';
+let namaToko = localStorage.getItem('namaToko') || 'TOKO PUNTEN';
 let html5QrCode;
 const beepSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'.replace('...','uT19q'));
 
