@@ -58,6 +58,8 @@
         .btn-debit { background: #2196F3; color: white; }
         .btn-qr { background: #FF9800; color: white; }
         .kembalian { font-size: 24px; color: #d32f2f; text-align: center; margin: 15px 0; font-weight: bold; }
+        .checkbox-cetak { display:flex;align-items:center;gap:10px;margin:15px 0;font-size:16px; }
+        .checkbox-cetak input { width:20px;height:20px; }
     </style>
 </head>
 <body>
@@ -169,13 +171,19 @@
         </div>
     </div>
 
-    <!-- MODAL CASH -->
+    <!-- MODAL CASH - UPDATE: ADA CHECKBOX CETAK STRUK -->
     <div id="modalCash" class="modal">
         <div class="modal-content">
             <h3>Pembayaran Tunai</h3>
             <p>Total: Rp <span id="totalCash">0</span></p>
             <input type="number" id="uangDiterima" placeholder="Uang Diterima" oninput="hitungKembalian()">
             <div class="kembalian">Kembalian: Rp <span id="kembalian">0</span></div>
+            
+            <label class="checkbox-cetak">
+                <input type="checkbox" id="cetakStruk" checked>
+                <span>Cetak Struk & Buka Laci</span>
+            </label>
+            
             <button class="btn-bayar" style="background:#4CAF50" onclick="selesaiBayar('Cash')">SELESAI</button>
             <button class="btn-bayar" style="background:#ccc;color:#333;margin-top:10px" onclick="tutupModalCash()">BATAL</button>
         </div>
@@ -389,6 +397,7 @@ function pilihCash() {
     document.getElementById('modalCash').style.display = 'block';
     document.getElementById('uangDiterima').value = '';
     document.getElementById('kembalian').innerText = '0';
+    document.getElementById('cetakStruk').checked = true; // Default centang
 }
 function tutupModalCash() { document.getElementById('modalCash').style.display = 'none'; }
 
@@ -399,11 +408,23 @@ function hitungKembalian() {
     document.getElementById('kembalian').innerText = kembali > 0 ? kembali.toLocaleString('id-ID') : '0';
 }
 
-function pilihDebit() { tutupModalBayar(); selesaiBayar('Debit'); }
-function pilihQR() { tutupModalBayar(); selesaiBayar('QRIS'); }
+function pilihDebit() { 
+    tutupModalBayar(); 
+    selesaiBayar('Debit'); 
+}
+function pilihQR() { 
+    tutupModalBayar(); 
+    selesaiBayar('QRIS'); 
+}
 
-// ===== FITUR BARU: CETAK STRUK + BUKA LACI OTOMATIS =====
-function cetakDanBukaLaci(total, metode, transaksi) {
+// ===== FITUR BARU: CETAK STRUK + BUKA LACI OTOMATIS DENGAN PILIHAN =====
+function cetakDanBukaLaci(total, metode, transaksi, mauCetak) {
+    // Kalo user ga centang "Cetak Struk", langsung return aja
+    if (!mauCetak) {
+        console.log('Transaksi tanpa cetak struk');
+        return;
+    }
+    
     let struk = `${namaToko}\n`;
     struk += `================\n`;
     struk += `Kasir: ${namaKasir}\n`;
@@ -416,6 +437,12 @@ function cetakDanBukaLaci(total, metode, transaksi) {
     });
     struk += `================\n`;
     struk += `TOTAL: Rp ${total.toLocaleString('id-ID')}\n`;
+    if(metode === 'Cash') {
+        const bayar = parseInt(document.getElementById('uangDiterima').value) || 0;
+        const kembali = bayar - total;
+        struk += `TUNAI: Rp ${bayar.toLocaleString('id-ID')}\n`;
+        struk += `KEMBALI: Rp ${kembali > 0 ? kembali.toLocaleString('id-ID') : '0'}\n`;
+    }
     struk += `================\n`;
     struk += `Terima kasih!\n\n\n`;
     
@@ -437,8 +464,14 @@ function selesaiBayar(metode) {
         items: [...keranjang]
     };
     
-    // PANGGIL FITUR BARU: CETAK + BUKA LACI
-    cetakDanBukaLaci(total, metode, transaksi);
+    // CEK APAKAH USER MAU CETAK STRUK - Default true untuk non-cash
+    let mauCetak = true;
+    if(metode === 'Cash') {
+        mauCetak = document.getElementById('cetakStruk').checked;
+    }
+    
+    // PANGGIL FITUR CETAK + BUKA LACI
+    cetakDanBukaLaci(total, metode, transaksi, mauCetak);
     
     laporan.push(transaksi);
     localStorage.setItem('laporanJual', JSON.stringify(laporan));
@@ -449,7 +482,10 @@ function selesaiBayar(metode) {
     });
     localStorage.setItem('daftarProduk', JSON.stringify(produk));
     
-    alert(`Transaksi ${metode} BERHASIL!\nTotal: Rp ${total.toLocaleString('id-ID')}`);
+    let pesanBerhasil = `Transaksi ${metode} BERHASIL!\nTotal: Rp ${total.toLocaleString('id-ID')}`;
+    if (!mauCetak) pesanBerhasil += '\n\nStruk tidak dicetak.';
+    
+    alert(pesanBerhasil);
     keranjang = [];
     updateKeranjang();
     renderProduk();
