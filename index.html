@@ -201,7 +201,6 @@ let namaKasir = localStorage.getItem('namaKasir') || '';
 let namaToko = localStorage.getItem('namaToko') || 'TOKO PUNTEN';
 let html5QrCode;
 
-// BEEP SOUND FIX - pake AudioContext biar ga bug
 function playBeep() {
     try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -227,7 +226,6 @@ if (namaKasir) {
     document.getElementById('modalLogin').style.display = 'block';
 }
 
-// FITUR SCAN CEPET BUAT SCANNER TEMBAK
 function scanCepat() {
     const barcode = document.getElementById('inputScanCepat').value.trim();
     document.getElementById('inputScanCepat').value = '';
@@ -404,6 +402,31 @@ function hitungKembalian() {
 function pilihDebit() { tutupModalBayar(); selesaiBayar('Debit'); }
 function pilihQR() { tutupModalBayar(); selesaiBayar('QRIS'); }
 
+// ===== FITUR BARU: CETAK STRUK + BUKA LACI OTOMATIS =====
+function cetakDanBukaLaci(total, metode, transaksi) {
+    let struk = `${namaToko}\n`;
+    struk += `================\n`;
+    struk += `Kasir: ${namaKasir}\n`;
+    struk += `Waktu: ${transaksi.waktu}\n`;
+    struk += `Metode: ${metode}\n`;
+    struk += `================\n`;
+    transaksi.items.forEach(item => {
+        struk += `${item.nama}\n`;
+        struk += `${item.qty} x ${item.harga.toLocaleString('id-ID')} = Rp${(item.harga*item.qty).toLocaleString('id-ID')}\n`;
+    });
+    struk += `================\n`;
+    struk += `TOTAL: Rp ${total.toLocaleString('id-ID')}\n`;
+    struk += `================\n`;
+    struk += `Terima kasih!\n\n\n`;
+    
+    // KODE TENDANGAN BUAT BUKA LACI: ESC p 0 25 250
+    const bukaLaci = '\x1B\x70\x00\x19\xFA'; 
+    
+    // Kirim ke RawBT - otomatis cetak + buka laci
+    const dataPrint = encodeURIComponent(struk + bukaLaci);
+    window.location.href = `rawbt://print?text=${dataPrint}`;
+}
+
 function selesaiBayar(metode) {
     const total = keranjang.reduce((s,i)=>s+i.harga*i.qty,0);
     const transaksi = {
@@ -413,6 +436,10 @@ function selesaiBayar(metode) {
         metode: metode,
         items: [...keranjang]
     };
+    
+    // PANGGIL FITUR BARU: CETAK + BUKA LACI
+    cetakDanBukaLaci(total, metode, transaksi);
+    
     laporan.push(transaksi);
     localStorage.setItem('laporanJual', JSON.stringify(laporan));
     
