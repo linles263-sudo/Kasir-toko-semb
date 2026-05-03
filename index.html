@@ -63,6 +63,33 @@
     </style>
 </head>
 <body>
+    <script>
+// ======== SISTEM KUNCI LISENSI KASIR ========
+const LISENSI = {
+  namaToko: "TOKO ANIS",             // ← Ganti nama toko pembeli
+  kodeLisensi: "KSR-2026-AN01",      // ← SB = Semb, 01 = pembeli ke-1
+  expired: "2028-05-03",             // ← Aktif 1 tahun
+  hpAdmin: "0895351432524"           // ← No WA lu Prof
+};
+
+// Cek tanggal hari ini vs tanggal expired
+const hariIni = new Date().toISOString().slice(0,10);
+if(hariIni > LISENSI.expired){
+  document.body.innerHTML = `
+    <div style="text-align:center;padding:50px;font-family:Arial,sans-serif">
+      <h1 style="color:#dc2626;font-size:28px">🔒 LISENSI HABIS</h1>
+      <p style="font-size:18px">Aplikasi <b>${LISENSI.namaToko}</b> sudah expired pada <b>${LISENSI.expired}</b></p>
+      <p>Silakan hubungi Admin untuk perpanjangan lisensi:</p>
+      <a href="https://wa.me/${LISENSI.hpAdmin}" style="background:#25D366;color:white;padding:15px 30px;border-radius:10px;text-decoration:none;display:inline-block;margin-top:20px;font-weight:bold">
+        Chat WA Admin Sekarang
+      </a>
+      <p style="margin-top:40px;font-size:12px;color:#666">Kode Lisensi: ${LISENSI.kodeLisensi}</p>
+    </div>
+  `;
+  throw new Error("Lisensi Expired");
+}
+// ======== AKHIR SISTEM KUNCI ========
+    </script>
     <div class="header">
         <div class="title">
             <h1>KASIR DIGITAL PRO</h1>
@@ -522,6 +549,10 @@ function hapusLaporan() {
 }
 
 renderProduk();
+// Update nama toko otomatis dari config LISENSI
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('namaToko').innerText = LISENSI.namaToko;
+});    
 </script>
 </body>
     </html>
